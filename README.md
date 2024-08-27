@@ -1,6 +1,6 @@
 ﻿Please consider supporting the project by clicking [![Github Sponsorship](.github/Sponsors.gif)](https://github.com/sponsors/00fox)
 
-**Opened Issues, please report bugs, problems (ot issues@00fox.com)**
+**Report Issues via CurseForge or by mail at issues@00fox.com**
 
 # FoxDB manages the SavedVariables of your addons, with EditMode included. (For World of Warcraft)
 version 11.0.2.0
