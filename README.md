@@ -3,6 +3,7 @@
 **Opened Issues, please report bugs, problems (ot issues@00fox.com)**
 
 # FoxDB manages the SavedVariables of your addons, with EditMode included. (For World of Warcraft)
+version 11.0.2.0
 
 You will be able to save variables depending on the template the user is in,
 not just globals and characters, and this, in an automated way in EditMode,
