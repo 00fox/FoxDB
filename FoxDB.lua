@@ -21,13 +21,13 @@
 		 otherwise, this part remains dormant.
 
 	 If you come from an already made addon in a classic way (global+profiles),
-		the transition exists internally to change these things
+		a transition exists internally to change these things
 			and keep the defaults in each profile that used it,
 			after which there is no longer a default profile.
-		The final goal being to use the globals,
+		the final goal being to use the globals,
 			the layout (instead of the profile)
 			and the profile for the few variables which remain necessary to be specific to each character.
-		But in the meantime, your base will continue to function as before,
+		but in the meantime, your base will continue to function as before,
 			as long as you don't start using the layouts yourself.
 
 	 Additional Content:
