@@ -1,0 +1,13 @@
+## Interface: 110002
+## Title: |cff1784d1Lib: FoxDB|r
+## Notes: FoxDB manages the SavedVariables of your addons, with EditMode included
+## Author: 00fox
+## X-Email: mail@00fox.com
+## X-Website: https://github.com/00fox/FoxDB
+## X-Feedback: https://github.com/00fox/FoxDB/issues
+## X-Category: Library
+## X-License: Artistic License 2.0
+## IconTexture: Interface\Icons\spell_shadow_brainwash
+## Version: Release-11.0.2
+
+FoxDB.lua
