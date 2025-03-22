@@ -65,4 +65,3 @@ Note:
 
 ## In your own addon you only need to include FoxDB.lua that's all.
 
-## You can find a complete example of an addon that uses it here: (soon)
