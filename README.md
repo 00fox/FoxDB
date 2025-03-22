@@ -51,7 +51,7 @@ Possibility of an Minimap icon, in ultra light code, without any inconvenience i
 -  Player's EditMode support to manage them, including visibility, so not conflicting with AddonCompartment.
 
 EditMode:
--  Addons that use EditMode receive a simplified common support for the correct functioning of all (addons and system).
+-  Addons that use EditMode receive a simplified common support for the correct functioning of all.
 -  Automatic frame registration.
 -  Automatic showing/hidding frames when entering/exiting EditMode.
 -  Automatic hidding system menus and highlighting frames.
