@@ -1,0 +1,141 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ http://wowprogramming.com/FrameXML/UI.xsd">
+	<CheckButton name="FoxDBTest_UICheckButtonTemplate" virtual="true" inherits="UICheckButtonTemplate">
+		<Size x="30" y="29"/>
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				local checked = self:GetChecked()
+				if checked then	PlaySound(856)		-- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+				else			PlaySound(857) end	-- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+				self.OnClick(self, checked)
+			</OnClick>
+			<OnEnter>
+				self.isMouseover = true
+				if self.tooltipText and self.tooltipText ~= "" then
+					C_Timer.After(0.25, function()
+						if self.isMouseover then
+							if GameTooltip then
+								GameTooltip:ClearLines()
+								GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 10, -9.5)
+								GameTooltip:AddLine(self.tooltipText, 1, 1, 1)
+								GameTooltip:Show()
+							end
+						end
+					end)
+				end
+			</OnEnter>
+			<OnLeave>
+				self.isMouseover = false
+				if GameTooltip and self.tooltipText and self.tooltipText ~= "" then
+					GameTooltip:Hide()
+				end
+			</OnLeave>
+		</Scripts>
+
+		<NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+		<PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+		<CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+		<DisabledCheckedTexture atlas="checkmark-minimal-disabled" useAtlasSize="true"/>
+	</CheckButton>
+
+	<Button name="FoxDBTest_SettingsButtonTemplate" virtual="true" inherits="UIPanelButtonTemplate">
+		<Size>
+			<AbsDimension x="177" y="24"/>
+		</Size>
+		<NormalFont style="GameFontNormalTiny"/>
+		<HighlightFont style="GameFontNormalTiny"/>
+	</Button>
+
+	<Button name="FoxDBTest_EmptyButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="18"/>
+		</Size>
+		<Frames>
+			<Button name="$parentToggle" hidden="true">
+				<Size>
+					<AbsDimension x="14" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad></OnLoad>
+					<OnClick></OnClick>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-MinusButton-UP"/>
+				<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-MinusButton-DOWN"/>
+				<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self.label = self:GetText()
+				self.selectioned	= false
+				self.activated		= true
+				self.modified		= false
+				self.SetState = function()
+					<![CDATA[
+					if not self.label then self.label = self:GetText() or "" end
+					if		self.selectioned	then
+						if	not self.activated	then	self:SetText("|cFF7070FF> "..self.label.." <")
+						else							self:SetText("|cFF14FF14> "..self.label.." <")
+						end
+					elseif	not self.activated	then	self:SetText("|cFF4545FF"..self.label)
+					elseif	self.modified		then	self:SetText("|cFFFF0000"..self.label)
+					else								self:SetText(self.label)
+					end
+					]]>
+				end
+				self.Click = function()
+					local parent = self:GetParent()
+					local childs = {parent:GetChildren()}
+					for _,child in next, childs do
+						child.selectioned = child == self
+						child:SetState()
+					end
+					self:OnClick()
+				end
+			</OnLoad>
+			<OnClick>
+				if self.selectioned then
+					if not self.OnActivate then return end
+					self.activated = not self.activated
+					self:SetState()
+					self:OnActivate()
+				else
+					self:Click()
+				end
+			</OnClick>
+			<OnEnter>
+				self.isMouseover = true
+				local tooltip = self.tooltipText
+				if(tooltip and tooltip ~= "") then
+					C_Timer.After(0.25, function()
+						if self.isMouseover then
+							GameTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+							GameTooltip:ClearAllPoints();
+							GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, true);
+							GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPRIGHT", -12, -12);
+						end
+					end);
+				end
+			</OnEnter>
+			<OnLeave>
+				self.isMouseover = false
+				local tooltip = self.tooltipText
+				if(tooltip and tooltip ~= "") then
+					GameTooltip:Hide()
+				end
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" justifyH="MIDDLE" wordwrap="false"/>
+		<NormalFont style="GameFontHighlight"/>
+		<HighlightFont style="GameFontHighlightOutline"/>
+	</Button>
+</Ui>

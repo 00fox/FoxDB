@@ -1,6 +1,5 @@
---[[--------------------------------------------------------------------------------- FoxDB 11.0.2-0
 
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-0▓▓
 ----------------------------------------------------------------------------------------------------
 --			FoxDB manages the SavedVariables of your addons, with EditMode included.
 ----------------------------------------------------------------------------------------------------
@@ -17,29 +16,35 @@
 		 so you will not encounter any problem when using it for a new addon,
 		 to make a transition from an old one or to keep an old one as it is.
 
+	 Layout management is fully automated, user access is not required,
+		 but some things are still doable.
+
 	 You of course still have access to a simplified version of the profiles;
 		 otherwise, this part remains dormant.
+
+	 No nightmares with default databases,
+		 you define variables in a function if they don't already exist on loading.
+		 In others, do what you need when the layout/profile is changed/reset.
 
 	 If you come from an already made addon in a classic way (global+profiles),
 		a transition exists internally to change these things
 			and keep the defaults in each profile that used it,
 			after which there is no longer a default profile.
-		the final goal being to use the globals,
-			the layout (instead of the profile)
-			and the profile for the few variables which remain necessary to be specific to each character.
-		but in the meantime, your base will continue to function as before,
-			as long as you don't start using the layouts yourself.
+			(Remember to make a backup beforehand)
 
-	 Additional Content:
-		 SavedVariable files are also written during /reload
-		 Layout management is fully automated, user access is not required, but some things are still doable.
-		 No nightmares with default databases,
-			you define variables in a function if they don't already exist on loading,
-			you do what you need when the layout/profile is changed/reset in another.
-		 Register one or several chat commands
-			and receive the arguments already split into a function.
-		 Possibility of an Minimap icon, in ultra light code, without any inconvenience if not used
-			Player's EditMode support to manage them include visibility, so not conflicting with AddonCompartment.
+	 The final goal being to use the globals,
+		the layout (instead of the profile),
+		and the profile for the few variables which remain necessary to be specific to each character.
+	 But in the meantime, your base will continue to function as before,
+		as long as you don't start using the layouts yourself.
+
+	 SavedVariable files are also written during /reload
+
+	 Register one or several chat commands
+		and receive the arguments already split into a function.
+
+	 Possibility of an Minimap icon, in ultra light code, without any inconvenience if not used.
+		Player's EditMode support to manage them, including visibility, so not conflicting with AddonCompartment.
 
 	 EditMode:
 		 Addons that use EditMode receive a simplified common support for the correct functioning of all (addons and system).
@@ -49,832 +54,10 @@
 		 Receive a callback when a frame is clicked to hide/show your menu.
 
 	 Note:
-		You manually start your addon, then load the data base, which will tell you when the layouts are ready;
+		You manually start your addon, then load the Database, which will tell you when the layouts are ready;
 		 you therefore control everything with a feeling of the early days of wow.
 
-
-	See the note FOR EDITMODE DEVELOPERS at the end of this review.
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---											USAGE:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				In your MyAddon.toc file:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-	## Title: MyAddon
-
-		...Add usual descriptions...
-
-	## SavedVariables: MyAddonDB
-
-		You don't need another library
-		FoxDB.xml
-
-		(OPTIONAL)
-		You may need advanced ones to do what you want, or, it is needed by another library
-			They're not recommanded, see chapter AVOID USING HEAVY LIBRARIES
-			To know about various callback, secure, hook functions
-			And how to use one line instead of 2000 from a library
-		libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-		libs\LibDataBroker-1.1.lua						
-		libs\AceGUI-3.0\AceGUI-3.0.xml					
-		libs\AceConfig-3.0\AceConfig-3.0.xml
-		libs\LibSharedMedia-3.0\lib.xml
-
-		Then,
-		MyAddon.lua
-		...
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				IN YOUR MyAddon.lua FILE:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			MANUAL START
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	MyAddon = {}
-
-	To access your addon as a global
-	_G.MyAddon		= MyAddon
-
-
-	You can simply use this (And that's it):
-		EventRegistry:RegisterFrameEventAndCallback("VARIABLES_LOADED", function() MyAddon:onInitialize() end, MyAddon)
-
-	Note: You can later unregister any Callback if you no longer needed
-		EventRegistry:UnregisterFrameEventAndCallback("VARIABLES_LOADED", MyAddon)
-
-
-	But if you want to handle multiple events in your add-on, better use this:
-				Event		-> Frame				-> Function
-	RegisterEvent		SetScript	CreateFrame		function
-
-	Define the function that will process the events
-		local function OnEvent(frame, event, arg)
-			if		event == "ADDON_LOADED" and arg == "MyAddon"		then MyAddon:onInitialize()			-- This call onInitialize after your addon is fully loaded
-
-			(OPTIONAL)
-			elseif	event == "ADDON_LOADED" and arg == "AnotherAddon"	then MyAddon:onAnotherAddon()		-- To do something after another addon is loaded
-			elseif	event == "VARIABLES_LOADED"							then MyAddon:onVariablesLoaded()	-- To do something with CVars, but better wait for layout loaded
-			elseif	event == "PLAYER_LOGIN"								then MyAddon:onPlayerLogin()		-- To do something when player login, only once when the UI loads
-			elseif	event == "SETTINGS_LOADED"							then MyAddon:onSettingsLoaded()		-- To do something when settings have been loaded
-			elseif	event == "PLAYER_ENTERING_WORLD"					then MyAddon:onEnteringWorld()		-- To do something when new zone is loaded
-			elseif	event == "PLAYER_REGEN_DISABLED"					then MyAddon:onCombatLockdown(true)	-- To so something when entering in combat (lock frames etc.)
-			elseif	event == "PLAYER_REGEN_ENABLED"						then MyAddon:onCombatLockdown(false)	-- or put the result in a variable
-			...
-			end
-		end
-	Note: Don't use "EDIT_MODE_LAYOUTS_UPDATED", FoxDB already call onLayoutLoaded()
-
-	Create the frame that will handle the events
-		local EventHandler = CreateFrame("Frame", nil)
-
-	Define the function that will process the events for the frame
-		EventHandler:SetScript("OnEvent", OnEvent)
-
-	Register any events to be processed by the frame (here in loading order, but not necessary)
-		EventHandler:RegisterEvent("ADDON_LOADED")
-		...
-
-	Note: function and frame can be subparts of MyAddon instead of local, in this case use:
-		function MyAddon:OnEvent(event, arg)
-		MyAddon.EventHandler = CreateFrame("Frame", nil)
-		local EventHandler = MyAddon.EventHandler
-		EventHandler:SetScript("OnEvent", MyAddon.OnEvent)
-		EventHandler:RegisterEvent("ADDON_LOADED")
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY YOU WHEN YOUR ADDON IS LOADED
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onInitialize()
-
-		Initialize your database
-			self.db = FoxDB:New(self, "MyAddonDB")
-
-		You can already access these tables:
-			self.db.global				-- Variables for all characters on the same account
-			self.db.realm				-- Variables for all characters that share the same realm
-			self.db.faction				-- Variables for all characters that share the same faction
-			self.db.race				-- Variables for all characters that share the same race
-			self.db.class				-- Variables for all characters that share the same class
-			self.db.frealm				-- Variables for all characters that share the same faction and realm
-
-		You can already access these keys:
-			self.db.keys.locked			-- If there is an operation in progress on the current layout/profile, set to true otherwise false
-			self.db.keys.editmode		-- Whether EditMode is active or not
-
-		When you intend to use profiles too (character dependant, OPTIONAL)
-			self.db.profile				-- Variables for current profile
-			self.db.keys.profile		-- Name of the current profile
-
-		Some stuff that don't need layouts
-		   Elements that require layouts start at onLayoutLoaded()
-		   !!! You should wait for onLayoutLoaded to do the real start of your addon
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY FOXDB WHEN LAYOUTS ARE READY	(REAL START OF YOUR ADDON)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onLayoutLoaded()
-
-		You can then access these table:
-			self.db.layout				-- Variables for all characters that share the same layout
-
-		You can then access these keys:
-			self.db.keys.layout			-- Name of the current layout
-
-	end
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				LAYOUTS:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY FOXDB WHEN A LAYOUT HAS BEEN CHANGED
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onLayoutChanged(MyAddonDB)
-
-		Stuff to do when layout has been changed. (load time, new, new by copy)
-
-		If the layout did not already exist, it was copied from the current layout, or onNewLayout() is called before if it exists
-
-		You may still want to reset some data,
-			self.db.layout.myVariable = true
-			self.db.layout.mySubBase = {}
-			self.db.layout.mySubBase.myVariable = true
-			self.db.layout.mySubBase.myVariable2 = "sometext"
-
-		Or you may need to erase some old datas
-			if self.db.layout.myUnneededVariable then self.db.layout.myUnneededVariable = nil
-			if self.db.layout.myUnneededSubBase then self.db.layout.myUnneededSubBase = nil
-
-		But more important, check/add the layout dependant datas
-		This is where you add them the first time,
-		and check if they are still present the second time, when a player change his layout,
-		so you need an if...then... wording to avoid overwriting the current content by the default one:
-			if type(self.db.layout.myVariable)				~= "boolean"	then self.db.layout.myVariable				= true			end
-			if not self.db.layout.mySubBase									then self.db.layout.mySubBase				= {}			end
-			if type(self.db.layout.mySubBase.myVariable)	~= "boolean"	then self.db.layout.mySubBase.myVariable	= true			end
-			if type(self.db.layout.mySubBase.myVariable2)	~= "string"		then self.db.layout.mySubBase.myVariable2	= "sometext"	end
-
-	end
-
-	Note: This is why there is no longer a default data system
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY FOXDB WHEN A LAYOUT DIDN'T EXIST (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onNewLayout(MyAddonDB)
-
-		Technically this will only happen on load if the layout doesn't exist,
-			because when creating (or moving to) a new layout,
-			the new layout is copied from the current one or from the source of copy.
-
-		Then do veryfirsttime stuff there, but better do variables management in onLayoutChanged.
-
-		Note: onLayoutChanged() will be called afterwards, don't call it yourself.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			CALLED BY FOXDB WHEN A LAYOUT HAS BEEN RENAMED (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onLayoutRenamed(MyAddonDB)
-
-		Occurs when the layout was simply renamed.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			CALLED BY FOXDB WHEN A LAYOUT HAS BEEN SAVED (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onLayoutSaved(MyAddonDB)
-
-		Occurs when the layout is saved but not changed, copied or saved.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			SPECIFIC LAYOUTS FUNCTIONS (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	self.db:GetLayouts()			-- Returns a table with the names of existing layouts - current in 1st place.
-	self.db:ResetLayout()			-- Clear the current layout. Will call onNewLayout() then onLayoutChanged()
-	self.db:CopyLayout(from)		-- Replace current layout by another. 'from' is a string with layout name.
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				PROFILES:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY FOXDB WHEN A PROFILE HAS BEEN CHANGED
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onProfileChanged(MyAddonDB)
-
-		Stuff to do when profile has been changed. (load time, reset or copy)
-
-		If the profile did not already exist onNewProfile() is called before if it exists
-
-		You may still want to reset some data,
-			self.db.profile.myVariable = true
-			self.db.profile.mySubBase = {}
-			self.db.profile.mySubBase.myVariable = true
-			self.db.profile.mySubBase.myVariable2 = "sometext"
-
-		Or you may need to erase some old datas
-			if self.db.profile.myUnneededVariable	then self.db.layout.myUnneededVariable = nil
-			if self.db.profile.myUnneededSubBase	then self.db.layout.myUnneededSubBase = nil
-
-		But more important, check/add the profile dependant datas
-		This is where you add them the first time,
-		and check if they are still present the second time, when a player change his profile, or character changed
-		so you need an if...then... wording to avoid overwriting the current content by the default one:
-			if type(self.db.profile.myVariable)				~= "boolean"	then self.db.profile.myVariable				= true			end
-			if not self.db.profile.mySubBase								then self.db.profile.mySubBase				= {}			end
-			if type(self.db.profile.mySubBase.myVariable)	~= "boolean"	then self.db.profile.mySubBase.myVariable	= true			end
-			if type(self.db.profile.mySubBase.myVariable2)	~= "string"		then self.db.profile.mySubBase.myVariable2	= "sometext"	end
-
-	end
-
-	Note: This is why there is no longer a default data system thanks to this. (global + default OR profile)
-		Now it's the global + layout and the profile if necessary.
-		If you still need to offer the user a choice for specific variables between global and profile,
-			Put the choice in a profile variable
-			Depending on this choice, use a golable variable or profile where necessary
-			A simple checkbox is then sufficient.
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED BY FOXDB WHEN A PROFILE DIDN'T EXIST (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onNewProfile(MyAddonDB)
-
-		There is no need for a default table and profile.
-
-		Then do veryfirsttime stuff there, but better do variables management in onProfileChanged.
-
-		Note: onProfileChanged() will be called afterwards, don't call it yourself.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			SPECIFIC PROFILES FUNCTIONS (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	self.db:GetProfiles()			-- Returns a table with the names of existing profiles - Current in 1st place.
-	self.db:DeleteProfile(profile) 	-- Deletes a profile, except current.
-	self.db:ResetProfile()			-- Clear the current profile. Will call onNewProfile() then onProfileChanged()
-	self.db:CopyProfile(from)		-- Replace current profile by another. 'from' is a string with profile name.
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---			HOW TO PLACE KEYS IN VARIABLES TO USE THEM MORE PRACTICALLY THROUGHOUT YOUR FILE
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-	local Global
-	local Layout
-	local Profile
-
-	function MyAddon:onInitialize()
-		MyAddon.db	= FoxDB:New(self, "MyAddonDB", [true])
-		Global		= MyAddon.db.global
-		[Profile	= MyAddon.db.profile]
-	end
-
-	function MyAddon:onLayoutLoaded()
-		Layout		= MyAddon.db.layout
-		(real start)
-	end
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				IF YOU WANT TO USE CHAT COMMANDS:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-	Place in your file a function:
-		MyAddon:onChatCommand(cmd, arg, ...)
-			if cmd == "myaddoncmd" then
-				if		arg == "argisarg"	then ...
-				elseif	arg == true			then ...
-				elseif	arg == 4			then ...
-				end
-			elseif cmd == "myaddoncmd2"		then ...
-			end
-		end
-
-	Then register the command with
-		self.db:RegisterChatCommand("myaddoncmd")
-
-	you can use it more than once to register multiple commands
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---										USING LOCALES:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
-	You can opt for common solutions, with a library, takes memory, uses complex opeerations,
-		plus compare tables (to takes the most appropriate value each time), for each addon.
-		Instead you just need to do that:
-
-	Make a directory named locale
-
-	Add a file in it, named xxYY.lua, for each locale you want, except your own
-		possibly enUS [, enGB], deDE, itIT, esES, esMX, frFR, koKR, ptBR, ruRU, zhCN, zhTW
-
-	In your main file:
-		MyAddon.L = {}
-
-	Two cases of files:
-
-		1. the default language, in which you will put everything you need for sure		(enUS.lua for example)
-			local _, MyAddon = ...
-			local L = MyAddon.L
-			L["My Text"] = "My Text"
-			...
-
-		2. an example of locale added													(deDE.lua for example)
-			if GetLocale() ~= "deDE" then return end	-- the file won't be executed if it is not the user's locale
-			local _, MyAddon = ...
-			local L = MyAddon.L
-			L["My Text"] = "Mein Text"
-			...
-
-	Add a line for each of them in your MyAddon.toc file,
-	Place them at first place just before your main addon lua,
-	and give priority to default language:
-			FoxDB.xml
-			locale\enUS.lua
-			locale\deDE.lua
-			...
-			MyAddon.lua
-
-	print(L["My Text"])
-
-	Advantage: 		Accessed directly.
-	Inconvenience:	Uses more memory.
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			OPTION 1: USE A SIMPLE BASE AND A FUNCTION
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	MyAddon.L = {}
-	local function L(text) return MyAddon.L[text] == true and text or MyAddon.L[text] end
-
-	L["My Text"] = true				-- default language
-	L["My Text"] = "Mein Text"		-- locale added
-
-	print(L("My Text"))
-
-	Advantage: 		Default language takes only half of the memory.
-	Inconvenience:	You need to pass by a function to access the value.
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			OPTION 2: USE A METATABLE, TO REINDEX THE REAL VALUES WITH STRINGS
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	MyAddon.L = setmetatable({}, {__newindex = function(self, key, value) rawset(self, key, value == true and key or value) end})
-	local L = MyAddon.L
-
-	L["My Text"] = true				-- default language
-	L["My Text"] = "Mein Text"		-- locale added
-
-	print(L["My Text"])
-
-	Advantage: 		Default language takes only half of the memory, accessed ~directly.
-	Inconvenience:	You need to pass by an indexed database to access the value.
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---									HOW TO USE A MINIMAP ICON:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
-	Minimap icons can be use to perform left, Middle and right click actions.
-		They can be quickly be moved into EditMode and get a dedicated menu.
-		The first time they get a random place onto the border of the minimap.
-		
-		Into EditMode:
-		The player can decide where to place and whether it stays visible or not outside EditMode.
-		The player can decide how much it grows to a factor size of x3 from 0.8.
-		The player can put an offset which change the distance between the center and the border of Minimap.
-		The player can adjust an alpha while mouseOn/Out.
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---				IN YOUR MAIN LUA FILE, MyAddon.lua:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	-- In
-	function MyAddon:onInitialize()
-
-		-- After
-		self.db = FoxDB:New(self, "MyAddonDB")
-
-		-- Need to be unique, usually addon name
-		self.db.icon.label = "MyAddon"
-
-		-- Needed icon object (https://www.wowhead.com/icons)
-		self.db.icon.file = "Interface\\Icons\\spell_shadow_brainwash"		-- (FreeMind addon example)
-
-		-- Optional:
-		self.db.icon.line1		= "Left click action"	-- Action on left click description.
-		self.db.icon.line2		= "Right click action"	-- Action on right click description.
-
-		-- Launch Icon
-		self.db:IconStart()
-
-	end
-
-	Note: If you want to refer to your own addon's icon, use self.db.iconinuse
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE CLICKING ON YOUR ICON OR PLAYER CHANGED VISIBILITY:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onIconLeftClick()
-		...
-	end
-
-	function MyAddon:onIconMiddleClick()
-		...
-	end
-
-	function MyAddon:onIconRightClick()
-		...
-	end
-
-	function MyAddon:onIconVisibility(visible)
-		...
-	end
-
-	Note: If you don't use these functions, don't put them, avoiding loading them as callbacks in memory
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			BROWSE ICONS TABLE:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	-- GetIcons returns a table containing all addons icons with their labels
-	for label,icon in pairs(self.db:GetIcons()) do ... end
-
-	-- Unique icon identifier
-	AddonName.db.iconinuse.label
-
-	-- Icon object
-	AddonName.db.iconinuse
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---									AVOID USING HEAVY LIBRARIES:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
-	Note: Avoid to use libraries for callbacks or other stuff, use them only if you really need them.
-		The idea was good, reducing the memory needed in total of all addons
-		Except that most of times
-			it consumes a lot of resources to handle all the possibilites of functions already present in wow
-				and this in most cases, for simple things you can do on your own
-			or it's 2000 lines of code and 500 lines being processed,
-				for only one if it had been done manually knowing that it's not that hard.
-
-
-	Registers a callback to a frame event
-		Example: "WORLD_CURSOR_TOOLTIP_UPDATE"
-		EventRegistry:RegisterFrameEventAndCallback(frameEvent, func, [owner], ...)
-		EventEventRegistry:UnregisterFrameEventAndCallback(frameEvent, owner)
-
-	Registers a callback to an event
-		Example: "EditMode.Enter"
-		EventRegistry:RegisterCallback(Event, func, [owner], ...)
-		EventEventRegistry:UnregisterCallback(Event, owner)
-
-	Registers a callback to a custom defined event (Mixin)
-		CallbackRegistryMixin:RegisterCallback(event, func, [owner], ...)
-		CallbackRegistryMixin:UnregisterCallback(event, owner)
-
-	Calls the specified function without propagating taint to the caller
-		securecallfunction(func, ...)
-
-	Gives a script to your own frame
-		Example: "OnClick"
-		frame:SetScript("handler", func [nil to remove])
-
-	Securely posthooks the specified frame function. Works with secure frames
-		Example: "OnClick"
-		frame:HookScript("handler", hookfunc)
-
-	Securely posthooks the specified function
-		The hook will be called with the same arguments after the original call is performed
-			hooksecurefunc([table,] functionName, hookfunc)
-
-	Create your own EditMode menus
-		See chapter: NOTE FOR EDITMODE DEVELOPPERS
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---										NOTE FOR TRANSITION:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---				START BY THE MANUAL START:
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-	!!! keep a copy of your SavedVariables file aside, you never know, while experimenting
-
-	Remove
-		MyAddon = LibStub("AceAddon-3.0"):NewAddon("MyAddon", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
-
-	Add
-		local _, MyAddon = ...
-		_G.MyAddon = MyAddon
-
-	And choose between
-		EventRegistry:RegisterFrameEventAndCallback("VARIABLES_LOADED", function() MyAddon:onInitialize() end, MyAddon)
-
-	Or
-		local function OnEvent(frame, event, arg)
-			if event == "ADDON_LOADED" and arg == "MyAddon" then MyAddon:onInitialize() end
-		end
-		local EventHandler = CreateFrame("Frame", nil)
-		EventHandler:SetScript("OnEvent", OnEvent)
-		EventHandler:RegisterEvent("ADDON_LOADED")
-
-	or
-		function MyAddon:OnEvent(event, arg)
-			if event == "ADDON_LOADED" and arg == "MyAddon" then MyAddon:onInitialize() end
-		end
-		MyAddon.EventHandler = CreateFrame("Frame", nil)
-		local EventHandler = MyAddon.EventHandler
-		EventHandler:SetScript("OnEvent", MyAddon.OnEvent)
-		EventHandler:RegisterEvent("ADDON_LOADED")
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			MODIFY EVERY CALLBACK, YOU DON'T NEED A LIBRARY IN MOST CASES
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	Example (2000 lines <> only one):
-
-	From this:
-		self:RegisterEvent("GAME_PAD_CONNECTED", self.GAME_PAD_CONNECTED)
-	To this:
-		EventRegistry:RegisterCallback("PLAYER_ENTERING_WORLD", self.PLAYER_ENTERING_WORLD, self)
-
-	See chapter: AVOID USING HEAVY LIBRARIES
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			CHANGE OnInitialize() TO onInitialize()
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	If you use self:RegisterChatCommand("myaddoncmd", function)
-
-	change it to self.db:RegisterChatCommand("myaddoncmd")
-		you can use it more than once to register multiple commands
-
-	rename your function(input)
-		to MyAddon:onChatCommand(cmd, arg, ...)
-		then benefit from an already splited arguments
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---			IF EVERYTHING GOES RIGHT THEN,
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			IN MyAddon.toc
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	Add FoxDB.xml
-	Remove libs\AceAddon-3.0\AceAddon-3.0.xml
-	Remove libs\LibStub\LibStub.lua
-		except if needed by another library
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			IN MyAddon.lua
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	If you use them, change all self.db.factionrealm to self.db.frealm
-	The transition exists internally to change these things (factionrealm to frealm...) in your database
-
-	In function
-	MyAddon:onInitialize()
-
-		Add
-			self.db = FoxDB:New(self, "MyAddonDB", true)		-- MyAddonDB same as in MyAddon.toc
-				true indicates that you use profiles for the moment
-				if you didn't use them, or changed to layouts later, you can remove it:
-					self.db = FoxDB:New(self, "MyAddonDB")
-
-	In function
-	MyAddon:onLayoutLoaded()
-
-		Put everything there was before in onInitialize() here,
-			it's the new start of the addon,
-			once the layouts have been loaded
-			what comes after the profiles.
-
-	In function
-	MyAddon:onProfileChanged()
-
-		There is still no more the concept of Default profile and complicated things with the definition of defaults variables.
-		This is where you add them the first time,
-		and check if they are still present the second time, when a player change his profile, or character changed
-		so you need an if...then... wording to avoid overwriting the current content by the default one.
-		(See chapter: FUNCTION CALLED BY FOXDB WHEN A PROFILE HAS BEEN CHANGED)
-
-		Put everything you need after a new profile, reset or copy
-		Note: you can optionally use MyAddon:onNewProfile()
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			TRY YOUR ADDON AT THIS STEP, IT SHOULD WORK AS BEFORE
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	Perhaps, it is still necessary to adapt the functions to manage the profiles
-
-	See chapter: SPECIFIC PROFILES FUNCTIONS
-
-	- self.db:GetProfiles()
-	- self.db:DeleteProfile(profile)
-	- self.db:ResetProfile()
-	- self.db:CopyProfile(from)
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			THEN, IF YOU WANT INSTEAD OF PROFILE, USE THE NEW, FULLY AUTOMATED LAYOUT FUNCTIONS
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	See chapter: USAGE/LAYOUTS
-
-	- function MyAddon:onLayoutLoaded(MyAddonDB)
-	- function MyAddon:onNewLayout(MyAddonDB)
-	- function MyAddon:onLayoutChanged(MyAddonDB)
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-----------------------------------------------------------------------------------------------------
---								NOTE FOR EditMode DEVELOPPERS:
-----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
-	If you want your addon to manages your own frames into EditMode,
-		you have to use EditModeSystemSelectionTemplate for overlays,
-		but you don't need another library to manage them in EditMode
-
-	It is important for all addons to know which frames are used during EditMode,
-		so they can open or close theirs menus, and highlight frames. FoxDB handle it.
-		Functions have been added to manage operations once for all addons.
-
-	So for example,
-
-		local MyFrame = CreateFrame("Frame", "MyFrameName", UIParent, "SecureHandlerStateTemplate")
-		local overlay = CreateFrame("Frame", "MyOverlayName", MyFrame, "EditModeSystemSelectionTemplate")
-		!!! Don't set the overlay's parent to UIParent, otherwise EditMode will get errors when moving system frames.
-
-		Manage position, etc.
-
-		Then register it with the FoxDB library.
-			self.db:RegisterSystemFrame(overlay)
-			While in EditMode, when player click on your frame:
-				Your overlay will be in yellow
-				Other overlays will be in white
-				You receive in onEditModeFrame function which overlay was clicked
-					and decide to show/close your own menu based on that
-					(Maybe you'll need to hide frames from addons that don't use FoxDB, but that's not necessary)
-
-		You can at any time unregister it, the frame will be hidden, and not shown again while entering edit mode.
-			self.db:UnregisterSystemFrame(overlay)
-
-	Remember you can use self.db.keys.editmode in functions to be sure EditMode is active or not.
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE ENTERING EditMode:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onEditModeEnter(grid, snap)
-
-		grid is a boolean, true if Grid is checked
-		snap is a boolean, true if Snap is checked
-
-		Note: Overlays will be automatically shown and highlighted
-		
-		you can transmit parameters to functions of next chapter.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE EXITING EditMode:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onEditModeExit()
-
-		You can call it while entering in combat under EditMode,
-			if your menu options changed in combat can cause taint.
-		Overlays will be automatically hidden.
-		You can close your menu.
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE A FRAME IS ACTIVATED:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onEditModeFrame(frame)
-
-		If it's a system one, frame == EditModeManagerFrame
-
-		If a non system frame is selected and system menu is shown,
-			system menu and overlays registred by other addons which use FoxDB
-			will automatically be closed.
-
-		Frames will be displayed in yellow or white and made movable
-			depending on whether they are selected or not.
-
-		Open or close your own menu based on it,
-		  and perform your onMouseDown actions (don't register onMouseDown).
-
-			if frame == MyAddonOverlay then
-				self:OpenMyAddonMenu()
-			else
-				self:CloseMyAddonMenu()
-			end
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE PLAYER CHANGE GRID OPTION: (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onEditModeGrid(grid)
-
-		grid is a boolean, true if Grid is checked
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---			FUNCTION CALLED WHILE PLAYER CHANGE SNAP OPTION: (OPTIONAL)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	function MyAddon:onEditModeSnap(snap)
-
-		snap is a boolean, true if Snap is checked
-
-	end
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
---				WHAT YOU NEED TO IMPLEMENT:
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-
-	Register OnDragStart and OnDragStop for overlay !!!but no OnMouseDown!!!
-		overlay:SetScript('OnDragStart', self.overlays.onDragStart)
-		overlay:SetScript('OnDragStop', self.overlays.onDragStop)
-
-	function MyAddon.overlays:onDragStart()
-		Hide your menu
-		Your frame should follow the overlay
-	end
-
-	function MyAddon.overlays:onDragStop()
-		Save your frame position according the overlay for next start
-		Show your menu again
-	end
-
-	Use the menu created by yourself (SecureHandlerStateTemplate + EditModeSystemSelectionTemplate)
-	(See IconManager example at the end of the file)
-
-	function MyAddon:OpenMyAddonMenu()
-		MyAddonMenu:Show()
-	end
-
-	function MyAddon:CloseMyAddonMenu()
-		MyAddonMenu:Hide()
-	end
 ]]
-
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 ----------------------------------------------------------------------------------------------------
@@ -883,45 +66,59 @@
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
+local min, max, floor, ceil, rand, sqrt, log	= math.min, math.max, math.floor, math.ceil, math.random, math.sqrt, math.log
+local huge, pi, cos, sin, deg, rad, atan2		= math.huge, math.pi, math.cos, math.sin, math.deg, math.rad, math.atan2
+local len, match, find, sub, split, format		= string.len, string.match, string.find, string.sub, string.split, string.format
+local lower, upper, capital						= string.lower, string.upper, function(str) return (str:gsub("^%l", string.upper)) end
+local insert, remove, concat, sort				= table.insert, table.remove, table.concat, table.sort
+local After, NewTicker, NewTimer				= C_Timer.After, C_Timer.NewTicker, C_Timer.NewTimer
+
+local GetLayouts								= C_EditMode.GetLayouts
+local IsAddonMessagePrefixRegistered			= C_ChatInfo.IsAddonMessagePrefixRegistered
+local RegisterAddonMessagePrefix				= C_ChatInfo.RegisterAddonMessagePrefix
+local SendAddonMessage							= C_ChatInfo.SendAddonMessage
+
+local addonname, addon							= ...
+addon.FoxDB										= {}
+local FoxDB										= addon.FoxDB
+
+
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 --										VARIABLES
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
-FoxDB = FoxDB or {}
-if not FoxDB then return end
 
 -- library for all databases
-FoxDB.db_registry = FoxDB.db_registry or {}
-
--- library for all icons
-FoxDB.db_icons = FoxDB.db_icons or {}
+FoxDB.Registry						= {}
 
 -- library for all EditMode frames
-FoxDB.db_frames = FoxDB.db_frames or {}
+FoxDB.Frames						= {}
+
+-- library for all icons
+FoxDB.Icons							= {}
 
 -- Locales
-FoxDB.db_L = FoxDB.db_L or {}
+FoxDB.L								= {}
 
--- table for indexing functions
-local FunctionsDB = {}
+-- Table for indexing main database functions
+local FunctionsDB					= {}
 
--- table for indexing Profile functions if used
-local FunctionsP = {}
+-- Table for indexing layout functions, different from main because in all databases
+local FunctionsL					= {}
 
-local locale		= GetLocale()
-local realmKey		= GetRealmName()
-local factionKey	= UnitFactionGroup("player")
-local raceKey		= select(2, UnitRace("player"))
-local classKey		= select(2, UnitClass("player"))
-local charKey		= UnitName("player") .. " - " .. realmKey
-local frealmKey		= factionKey .. " - " .. realmKey
+-- Table for indexing Profile functions, different from layout because not necessary used
+local FunctionsP					= {}
 
-local min, max, rand, sqrt, pi, cos, sin, atan2 = math.min, math.max, math.random, math.sqrt, math.pi, math.cos, math.sin, math.atan2
-local find = string.find
-local GetLayouts = C_EditMode.GetLayouts
+local locale						= GetLocale()
+local nameKey						= UnitName("player")
+local raceKey						= select(2, UnitRace("player"))
+local classKey						= select(2, UnitClass("player"))
+local factionKey					= UnitFactionGroup("player")
+local realmKey						= GetRealmName()
+local charKey						= UnitName("player").." - "..realmKey
+local frealmKey						= factionKey.." - "..realmKey
 
-FoxDB.IconManager = FoxDB.IconManager or CreateFrame("Frame", nil, UIParent, "ResizeLayoutFrame")
-local IconManager = FoxDB.IconManager
+local IconManager					= CreateFrame("Frame", nil, UIParent, "ResizeLayoutFrame")
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -929,99 +126,97 @@ local IconManager = FoxDB.IconManager
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
-if #FoxDB.db_L == 0 then
-	if locale == "deDE" then
-		FoxDB.db_L["Icon is not visible"]	= "Symbol ist nicht sichtbar"
-		FoxDB.db_L["Tooltip deactivated"]	= "Tooltip deaktiviert"
-		FoxDB.db_L["Visible"]				= "Sichtbar"
-		FoxDB.db_L["Tooltip"]				= "Tooltip"
-		FoxDB.db_L["Mouse On"]				= "Maus an"
-		FoxDB.db_L["Mouse Out"]				= "Mouse Out"
-		FoxDB.db_L["Offset"]				= "Versatz"
-		FoxDB.db_L["Next minimap icon"]		= "Nächstes Minikartensymbol"
+if locale == "deDE" then
+	FoxDB.L["Icon is not visible"]	= "Symbol ist nicht sichtbar"
+	FoxDB.L["Tooltip deactivated"]	= "Tooltip deaktiviert"
+	FoxDB.L["Visible"]				= "Sichtbar"
+	FoxDB.L["Tooltip"]				= "Tooltip"
+	FoxDB.L["Mouse On"]				= "Maus an"
+	FoxDB.L["Mouse Out"]				= "Mouse Out"
+	FoxDB.L["Offset"]				= "Versatz"
+	FoxDB.L["Next minimap icon"]		= "Nächstes Minikartensymbol"
 
-	elseif locale == "itIT" then
-		FoxDB.db_L["Icon is not visible"]	= "L'icona non è visibile"
-		FoxDB.db_L["Tooltip deactivated"]	= "Descrizione disattivata"
-		FoxDB.db_L["Visible"]				= "Visibile"
-		FoxDB.db_L["Tooltip"]				= "Descrizione"
-		FoxDB.db_L["Mouse On"]				= "Mouse acceso"
-		FoxDB.db_L["Mouse Out"]				= "Mouse fuori"
-		FoxDB.db_L["Offset"]				= "Compensare"
-		FoxDB.db_L["Next minimap icon"]		= "Icona successiva sulla minimappa"
+elseif locale == "itIT" then
+	FoxDB.L["Icon is not visible"]	= "L'icona non è visibile"
+	FoxDB.L["Tooltip deactivated"]	= "Descrizione disattivata"
+	FoxDB.L["Visible"]				= "Visibile"
+	FoxDB.L["Tooltip"]				= "Descrizione"
+	FoxDB.L["Mouse On"]				= "Mouse acceso"
+	FoxDB.L["Mouse Out"]				= "Mouse fuori"
+	FoxDB.L["Offset"]				= "Compensare"
+	FoxDB.L["Next minimap icon"]		= "Icona successiva sulla minimappa"
 
-	elseif locale == "esES" or locale == "esMX" then
-		FoxDB.db_L["Icon is not visible"]	= "El icono no es visible"
-		FoxDB.db_L["Tooltip deactivated"]	= "Información desactivada"
-		FoxDB.db_L["Visible"]				= "Visible"
-		FoxDB.db_L["Tooltip"]				= "Información"
-		FoxDB.db_L["Mouse On"]				= "Ratón encendido"
-		FoxDB.db_L["Mouse Out"]				= "Ratón fuera"
-		FoxDB.db_L["Offset"]				= "Compensar"
-		FoxDB.db_L["Next minimap icon"]		= "Siguiente icono del minimapa"
+elseif locale == "esES" or locale == "esMX" then
+	FoxDB.L["Icon is not visible"]	= "El icono no es visible"
+	FoxDB.L["Tooltip deactivated"]	= "Información desactivada"
+	FoxDB.L["Visible"]				= "Visible"
+	FoxDB.L["Tooltip"]				= "Información"
+	FoxDB.L["Mouse On"]				= "Ratón encendido"
+	FoxDB.L["Mouse Out"]				= "Ratón fuera"
+	FoxDB.L["Offset"]				= "Compensar"
+	FoxDB.L["Next minimap icon"]		= "Siguiente icono del minimapa"
 
-	elseif locale == "frFR" then
-		FoxDB.db_L["Icon is not visible"]	= "L'icône n'est pas visible"
-		FoxDB.db_L["Tooltip deactivated"]	= "Info-bulle désactivée"
-		FoxDB.db_L["Visible"]				= "Visible"
-		FoxDB.db_L["Tooltip"]				= "Info-bulle"
-		FoxDB.db_L["Mouse On"]				= "Souris dessus"
-		FoxDB.db_L["Mouse Out"]				= "Souris dehors"
-		FoxDB.db_L["Offset"]				= "Offset"
-		FoxDB.db_L["Next minimap icon"]		= "Prochaine Icône de minimap"
+elseif locale == "frFR" then
+	FoxDB.L["Icon is not visible"]	= "L'icône n'est pas visible"
+	FoxDB.L["Tooltip deactivated"]	= "Info-bulle désactivée"
+	FoxDB.L["Visible"]				= "Visible"
+	FoxDB.L["Tooltip"]				= "Info-bulle"
+	FoxDB.L["Mouse On"]				= "Souris dessus"
+	FoxDB.L["Mouse Out"]				= "Souris dehors"
+	FoxDB.L["Offset"]				= "Offset"
+	FoxDB.L["Next minimap icon"]		= "Prochaine Icône de minimap"
 
-	elseif locale == "koKR" then
-		FoxDB.db_L["Icon is not visible"]	= "아이콘이 보이지 않습니다"
-		FoxDB.db_L["Tooltip deactivated"]	= "툴팁 비활성화됨"
-		FoxDB.db_L["Visible"]				= "보이는"
-		FoxDB.db_L["Tooltip"]				= "툴팁"
-		FoxDB.db_L["Mouse On"]				= "마우스 온"
-		FoxDB.db_L["Mouse Out"]				= "마우스 아웃"
-		FoxDB.db_L["Offset"]				= "오프셋"
-		FoxDB.db_L["Next minimap icon"]		= "다음 미니맵 아이콘"
+elseif locale == "koKR" then
+	FoxDB.L["Icon is not visible"]	= "아이콘이 보이지 않습니다"
+	FoxDB.L["Tooltip deactivated"]	= "툴팁 비활성화됨"
+	FoxDB.L["Visible"]				= "보이는"
+	FoxDB.L["Tooltip"]				= "툴팁"
+	FoxDB.L["Mouse On"]				= "마우스 온"
+	FoxDB.L["Mouse Out"]				= "마우스 아웃"
+	FoxDB.L["Offset"]				= "오프셋"
+	FoxDB.L["Next minimap icon"]		= "다음 미니맵 아이콘"
 
-	elseif locale == "ptBR" then
-		FoxDB.db_L["Icon is not visible"]	= "O ícone não está visível"
-		FoxDB.db_L["Tooltip deactivated"]	= "Dica desativada"
-		FoxDB.db_L["Visible"]				= "Visível"
-		FoxDB.db_L["Tooltip"]				= "Dica"
-		FoxDB.db_L["Mouse On"]				= "Mouse entrar"
-		FoxDB.db_L["Mouse Out"]				= "Mouse sair"
-		FoxDB.db_L["Offset"]				= "Desvio"
-		FoxDB.db_L["Next minimap icon"]		= "Próximo ícone do minimapa"
+elseif locale == "ptBR" then
+	FoxDB.L["Icon is not visible"]	= "O ícone não está visível"
+	FoxDB.L["Tooltip deactivated"]	= "Dica desativada"
+	FoxDB.L["Visible"]				= "Visível"
+	FoxDB.L["Tooltip"]				= "Dica"
+	FoxDB.L["Mouse On"]				= "Mouse entrar"
+	FoxDB.L["Mouse Out"]				= "Mouse sair"
+	FoxDB.L["Offset"]				= "Desvio"
+	FoxDB.L["Next minimap icon"]		= "Próximo ícone do minimapa"
 
-	elseif locale == "ruRU" then
-		FoxDB.db_L["Icon is not visible"]	= "Значок не виден"
-		FoxDB.db_L["Tooltip deactivated"]	= "Подсказка отключена"
-		FoxDB.db_L["Visible"]				= "Видимый"
-		FoxDB.db_L["Tooltip"]				= "Подсказка"
-		FoxDB.db_L["Mouse On"]				= "Мышь включена"
-		FoxDB.db_L["Mouse Out"]				= "Мышь выведена"
-		FoxDB.db_L["Offset"]				= "Компенсировать"
-		FoxDB.db_L["Next minimap icon"]		= "Следующий значок"
+elseif locale == "ruRU" then
+	FoxDB.L["Icon is not visible"]	= "Значок не виден"
+	FoxDB.L["Tooltip deactivated"]	= "Подсказка отключена"
+	FoxDB.L["Visible"]				= "Видимый"
+	FoxDB.L["Tooltip"]				= "Подсказка"
+	FoxDB.L["Mouse On"]				= "Мышь включена"
+	FoxDB.L["Mouse Out"]				= "Мышь выведена"
+	FoxDB.L["Offset"]				= "Компенсировать"
+	FoxDB.L["Next minimap icon"]		= "Следующий значок"
 
-	elseif locale == "zhCN" or locale == "zhTW" then
-		FoxDB.db_L["Icon is not visible"]	= "图标不可见"
-		FoxDB.db_L["Tooltip deactivated"]	= "提示关闭"
-		FoxDB.db_L["Visible"]				= "可见的"
-		FoxDB.db_L["Tooltip"]				= "工具提示"
-		FoxDB.db_L["Mouse On"]				= "鼠标打开"
-		FoxDB.db_L["Mouse Out"]				= "鼠标移出"
-		FoxDB.db_L["Offset"]				= "抵消"
-		FoxDB.db_L["Next minimap icon"]		= "下一个小地图图标"
+elseif locale == "zhCN" or locale == "zhTW" then
+	FoxDB.L["Icon is not visible"]	= "图标不可见"
+	FoxDB.L["Tooltip deactivated"]	= "提示关闭"
+	FoxDB.L["Visible"]				= "可见的"
+	FoxDB.L["Tooltip"]				= "工具提示"
+	FoxDB.L["Mouse On"]				= "鼠标打开"
+	FoxDB.L["Mouse Out"]				= "鼠标移出"
+	FoxDB.L["Offset"]				= "抵消"
+	FoxDB.L["Next minimap icon"]		= "下一个小地图图标"
 
-	else
-		FoxDB.db_L["Icon is not visible"]	= true
-		FoxDB.db_L["Tooltip deactivated"]	= true
-		FoxDB.db_L["Visible"]				= true
-		FoxDB.db_L["Tooltip"]				= true
-		FoxDB.db_L["Mouse On"]				= true
-		FoxDB.db_L["Mouse Out"]				= true
-		FoxDB.db_L["Offset"]				= true
-		FoxDB.db_L["Next minimap icon"]		= true
-	end
+else
+	FoxDB.L["Icon is not visible"]	= true
+	FoxDB.L["Tooltip deactivated"]	= true
+	FoxDB.L["Visible"]				= true
+	FoxDB.L["Tooltip"]				= true
+	FoxDB.L["Mouse On"]				= true
+	FoxDB.L["Mouse Out"]				= true
+	FoxDB.L["Offset"]				= true
+	FoxDB.L["Next minimap icon"]		= true
 end
-local function L(text) return FoxDB.db_L[text] == true and text or FoxDB.db_L[text] end
+local function L(text) return FoxDB.L[text] == true and text or FoxDB.L[text] end
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -1060,6 +255,7 @@ local function clearTable(t)
 	end
 end
 
+
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 --										FIRST CALL
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -1067,17 +263,21 @@ end
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
--- self.db = FoxDB:New(self, "MyAddonDB", useProfiles)
-function FoxDB:New(self, MyAddonDB, useProfiles)
+-- self.db = FoxDB:New("MyAddonDB", useProfiles)
+local firstdatabase = true
+local maindb
+function addon:New(MyAddonDB, useProfiles)
 ----------------------------------------------------------------------------------------------------
-	if type(self) ~= "table"				then error("Usage: FoxDB:New(self, MyAddonDB, useProfiles): 'self' is required", 2) end
-	if not MyAddonDB						then error("Usage: FoxDB:New(self, MyAddonDB, useProfiles): 'MyAddonDB', is required", 2) end
-	if type(MyAddonDB) ~= "string"			then error("Usage: FoxDB:New(self, MyAddonDB, useProfiles): 'MyAddonDB', string is required", 2) end
-	if useProfiles and useProfiles ~= true	then error("Usage: FoxDB:New(self, MyAddonDB, useProfiles): 'useProfiles', true is required or leave empty", 2) end
-	
+	if not MyAddonDB						then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', is required", 2) end
+	if type(MyAddonDB) ~= "string"			then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', string is required", 2) end
+	if useProfiles and useProfiles ~= true	then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'useProfiles', true is required or leave empty", 2) end
+
 	-- Database initialization
 	local database = _G[MyAddonDB]
-	if not database then database = {} _G[MyAddonDB] = database end
+	if not database then
+		database = {}
+		_G[MyAddonDB] = database
+	end
 
 	-- Transition
 	if database.profileKeys then
@@ -1100,10 +300,10 @@ function FoxDB:New(self, MyAddonDB, useProfiles)
 	end
 
 	-- Generate the 'always' database keys
-	if not database.global then database.global = {} end
-	if not database.layouts then database.layouts = {} end
-	if not database.profiles then database.profiles = {} end
-	if not database.icon then database.icon = {} end
+							if not database.global		then database.global	= {} end
+							if not database.layouts		then database.layouts	= {} end
+							if not database.profiles	then database.profiles	= {} end
+	if firstdatabase then	if not database.icon		then database.icon		= {} end end
 
 	-- Initializes the meta database
 	local db = setmetatable({}, {__index = database})
@@ -1119,16 +319,27 @@ function FoxDB:New(self, MyAddonDB, useProfiles)
 		["class"]		= classKey,
 		["frealm"]		= frealmKey,
 		["icon"]		= false,		-- container for icon data
-		--["layout"]	= false,		-- known only after the launch of EditMode
-		--["profile"]	= false,		-- set while New(self, "MyAddonDB") function
+--		["layout"]		= false,		-- known only after the launch of EditMode
+--		["profile"]		= false,		-- set while New("MyAddonDB") function
 	}
 
 	-- Add properties
 	db.keys				= keys
-	db.keys.name		= MyAddonDB
+	db.keys.main		= firstdatabase
+	db.keys.profiles	= useProfiles
+	db.keys.dbname		= MyAddonDB
 	db.keys.chat		= 0
 	db.keys.locked		= true			-- An operation is in progress concerning the current layout or profile
 	db.keys.editmode	= false			-- Whether EditMode is active or not
+
+	db.keys.name		= nameKey
+	db.keys.race		= raceKey
+	db.keys.class		= classKey
+	db.keys.faction		= factionKey
+	db.keys.realm		= realmKey
+	db.keys.char		= charKey
+	db.keys.frealm		= frealmKey
+
 	db.database			= database
 
 	-- Generate the database keys for each dynamic section
@@ -1140,41 +351,22 @@ function FoxDB:New(self, MyAddonDB, useProfiles)
 		end
 	end
 
-	-- Add callbacks if exists
-
-	if self.onIconLeftClick		then db.onIconLeftClick		= function() self.onIconLeftClick(self)		end end
-	if self.onIconMiddleClick	then db.onIconMiddleClick	= function() self.onIconMiddleClick(self)	end end
-	if self.onIconRightClick	then db.onIconRightClick	= function() self.onIconRightClick(self)	end end
-	if self.onIconVisibility	then db.onIconVisibility	= function(visible) self.onIconVisibility(self,visible)				end end
-	if self.onChatCommand		then db.onChatCommand		= function(cmd, arg, ...) self.onChatCommand(self, cmd, arg, ...)	end end
-
-	if EditModeManagerFrame then
-		if self.onLayoutLoaded	then db.onLayoutLoaded	= function() self.onLayoutLoaded(self, MyAddonDB)		end end
-		if self.onNewLayout		then db.onNewLayout		= function() self.onNewLayout(self, MyAddonDB)			end end
-		if self.onLayoutChanged	then db.onLayoutChanged	= function() self.onLayoutChanged(self, MyAddonDB)		end end
-		if self.onLayoutRenamed	then db.onLayoutRenamed	= function() self.onLayoutRenamed(self, MyAddonDB)		end end	
-		if self.onLayoutSaved	then db.onLayoutSaved	= function() self.onLayoutSaved(self, MyAddonDB)		end end
-
-		if self.onEditModeEnter	then db.onEditModeEnter	= function(grid, snap)	self.onEditModeEnter(self, grid, snap)	end end
-		if self.onEditModeGrid	then db.onEditModeGrid	= function(grid)		self.onEditModeGrid(self, grid)			end end
-		if self.onEditModeSnap	then db.onEditModeSnap	= function(snap)		self.onEditModeSnap(self, snap)			end end
-		if self.onEditModeExit	then db.onEditModeExit	= function()			self.onEditModeExit(self)				end end
-		if self.onEditModeFrame	then db.onEditModeFrame	= function(frame, icon)	self.onEditModeFrame(self, frame, icon)	end end
+	if firstdatabase then
+		firstdatabase = nil
+		maindb = db
+		db.icon.button = FoxDB.Icon
+		for name, Function in pairs(FunctionsDB) do db[name] = Function end
 	end
 
-	-- locally add functions to do implicit calls
-	for name, FunctionDB in pairs(FunctionsDB) do db[name] = FunctionDB end
+	-- locally add layouts functions
+	for name, Function in pairs(FunctionsL) do db[name] = Function end
 
 	-- Add profile
 	database.profile = nil
 	if useProfiles then
 
-		-- Add callbacks if exists
-		if self.onNewProfile		then db.onNewProfile		= function() self.onNewProfile(self, MyAddonDB)		end end
-		if self.onProfileChanged	then db.onProfileChanged	= function() self.onProfileChanged(self, MyAddonDB)	end end
-
-		-- locally add functions related to the use of profiles to do implicit meta calls
-		for name, FunctionP in pairs(FunctionsP) do db[name] = FunctionP end
+		-- locally add profiles functions
+		for name, Function in pairs(FunctionsP) do db[name] = Function end
 
 		-- Generate the profile key
 		db.profile = {}
@@ -1191,13 +383,13 @@ function FoxDB:New(self, MyAddonDB, useProfiles)
 		-- Change keys.profile name
 		db.keys.profile = charKey
 
-		-- Indicate if the profile was created to launch onNewProfile before onProfileChanged/onLayoutLoaded
+		-- Indicate if the profile was created to launch onNewProfile before onProfileChanged
 		db.keys.newprofile = newprofile
 
 	end
 
 	-- Store in registry
-	FoxDB.db_registry[db] = true
+	FoxDB.Registry[db] = true
 
 	db.keys.locked = false
 
@@ -1212,86 +404,55 @@ end
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
--- self.db = FoxDB:Add(self, "MyAddonDB", useProfiles)
+-- Register one or several Chat Commands, receive splitted arguments
 function FunctionsDB:RegisterChatCommand(cmd)
 ----------------------------------------------------------------------------------------------------
 	if not cmd									then error("Usage: RegisterChatCommand(cmd): 'cmd', is required", 2) end
 	if type(cmd) ~= "string"					then error("Usage: RegisterChatCommand(cmd): 'cmd', string is required", 2) end
-	if not self.onChatCommand					then error("Usage: RegisterChatCommand(cmd): you have not defined 'onChatCommand' function in your file", 2) end
-	if type(self.onChatCommand) ~= "function"	then error("Usage: RegisterChatCommand(cmd): 'onChatCommand' function is required", 2) end
+	if not addon.onChatCommand					then error("Usage: RegisterChatCommand(cmd): you have not defined 'onChatCommand' function in your file", 2) end
+	if type(addon.onChatCommand) ~= "function"	then error("Usage: RegisterChatCommand(cmd): 'onChatCommand' function is required", 2) end
 
 	if self.keys.chat == 0 then
 
 		local function ChatCommand(msg, editbox)
-			local _, _, cmd, msg = find(msg or "", "%s?(%w+)%s?(.*)")
-			local _, _, arg, msg = find(msg or "", "%s?(%w+)%s?(.*)")
-			self.onChatCommand(cmd or "", arg or "", msg or "")
+			msg = msg:gsub("%s*/"..cmd:lower().."%s*", "\n")
+			msg = msg:gsub("[\r\n]+", "\n")
+			msg = msg:gsub("[\n\n]+", "\n")
+			for i,line in ipairs({split("\n", msg)}) do
+				local _, _, arg1, line = find(line or "", "%s*(%S+)(.*)")
+				local _, _, arg2, line = find(line or "", "%s*(%S+)(.*)")
+				local _, _, arg3, line = find(line or "", "%s*(%S+)(.*)")
+				local _, _, arg4 = find(line or "", "%s*(.*)")
+				addon.onChatCommand(addon, cmd, arg1 or "", arg2 or "", arg3 or "", arg4 or "")
+			end
 		end
-		SlashCmdList[self.keys.name] = ChatCommand
+		SlashCmdList[self.keys.dbname] = ChatCommand
 
 	end
 
 	self.keys.chat = self.keys.chat+1
-	_G["SLASH_"..self.keys.name..tostring(self.keys.chat)] = "/"..cmd:lower()
+	_G["SLASH_"..self.keys.dbname..tostring(self.keys.chat)] = "/"..cmd:lower()
 end
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---										LAYOUTS
+--										GLOBAL
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
----------------------------------------------------------------------------------------------------
--- Returns a table with the names of existing layouts - current in 1st place.
-function FunctionsDB:GetLayouts()
 ----------------------------------------------------------------------------------------------------
-	local layouts = {}
-	layouts[1] = self.keys.layout
-
-	local i = 2
-	for layout,_ in pairs(self.database.layouts) do
-		if layout ~= self.keys.layout then
-			layouts[i] = layout
-			i = i + 1
-		end
-	end
-
-	return layouts
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
--- Clear the current layout.
-function FunctionsDB:ResetLayout()
+-- Clear the global variables.
+function FunctionsDB:ResetGlobal()
 ----------------------------------------------------------------------------------------------------
 	self.keys.locked = true
 
-		-- Clear the current layout
-		for k,v in pairs(self.layout) do self.layout[k] = nil end
-		if self.onNewLayout then securecallfunction(self.onNewLayout) end
+		-- Clear the current global variables
+		for k,v in pairs(self.global) do self.global[k] = nil end
+		if addon.onInitialize then securecall(addon.onInitialize, addon, true) end
 
 	self.keys.locked = false
-	if self.onLayoutChanged then securecallfunction(self.onLayoutChanged) end
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
--- Replace current layout by another.
-function FunctionsDB:CopyLayout(from)
-----------------------------------------------------------------------------------------------------
-	if not from or type(from) ~= "string"	then error(("CopyLayout(from): 'from' - string expected."), 2) end
-	if not self.database.layouts[from]		then error(("CopyLayout error: %q does not exist."):format(from), 2) end
-	if from == self.keys.layout				then return end	--Source and destination are the same
-
-	self.keys.locked = true
-
-		-- Clear the destination layout
-		for k,v in pairs(self.layout) do self.layout[k] = nil end
-
-		-- Copy the layout to current (no link)
-		copyTable(self.database.layouts[from], self.layout)
-
-	self.keys.locked = false
-	if self.onLayoutChanged then securecallfunction(self.onLayoutChanged) end
+	if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, self.keys.dbname) end
 end
 
 
@@ -1302,23 +463,19 @@ end
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ---------------------------------------------------------------------------------------------------
--- Returns a table with the names of existing profiles - Current in 1st place.
-function FunctionsDB:GetProfiles()
+-- Returns a table with the names of existing profiles - Current in 1st place, or not there if "nocurrent".
+function FunctionsP:GetProfiles(nocurrent)
 ----------------------------------------------------------------------------------------------------
 	local profiles = {}
 
-	if self.keys.profile then
+	local i = 1
+	if not nocurrent and self.keys.profile then
+		i = 2
 		profiles[1] = self.keys.profile
-		local i = 2
-		for profile,_ in pairs(self.database.profiles) do
-			if profile ~= self.keys.profile then
-				profiles[i] = profile
-				i = i + 1
-			end
-		end
-	else
-		local i = 2
-		for profile,_ in pairs(self.database.profiles) do
+	end
+
+	for profile,_ in pairs(self.database.profiles) do
+		if profile ~= self.keys.profile then
 			profiles[i] = profile
 			i = i + 1
 		end
@@ -1329,11 +486,11 @@ end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 -- Deletes a profile, except current.
-function FunctionsDB:DeleteProfile(profilename)
+function FunctionsP:DeleteProfile(profilename)
 ----------------------------------------------------------------------------------------------------
 	if not profilename or type(profilename) ~= "string"	then error(("DeleteProfile(profilename): 'profilename' - string expected."), 2) end
 	if not self.database.profiles[profilename]			then error(("DeleteProfile error: %q does not exist."):format(profilename), 2) end
-	if profilename == self.keys.profile					then return end	-- Use ResetProfile()
+	if profilename == self.keys.profile					then error(("Current profile, Use ResetProfile() instead."), 2) end
 
 	-- Remove the profile
 	self.database.profiles[profilename] = nil
@@ -1349,10 +506,10 @@ function FunctionsP:ResetProfile()
 	for k,v in pairs(self.profile) do
 		self.profile[k] = nil
 	end
-	if self.onNewProfile then securecallfunction(self.onNewProfile) end
+	if self.keys.profiles and addon.onNewProfile then securecall(addon.onNewProfile, addon, self.keys.dbname) end
 
 	self.keys.locked = false
-	if self.onProfileChanged then securecallfunction(self.onProfileChanged) end
+	if self.keys.profiles and addon.onProfileChanged then securecall(addon.onProfileChanged, addon, self.keys.dbname) end
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
@@ -1372,7 +529,165 @@ function FunctionsP:CopyProfile(from)
 	copyTable(self.database.profiles[from], self.profile)
 
 	self.keys.locked = false
-	if self.onProfileChanged then securecallfunction(self.onProfileChanged) end
+	if self.keys.profiles and addon.onProfileChanged then securecall(addon.onProfileChanged, addon, self.keys.dbname) end
+end
+
+
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--										LAYOUTS
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+---------------------------------------------------------------------------------------------------
+-- Returns a table with the names of existing layouts - current in 1st place, or not there if "nocurrent".
+function FunctionsL:GetLayouts(nocurrent)
+----------------------------------------------------------------------------------------------------
+	local layouts = {}
+
+	local i = 1
+	if not nocurrent and self.keys.layout then
+		i = 2
+		layouts[1] = self.keys.layout
+	end
+
+	for layout,_ in pairs(self.database.layouts) do
+		if layout ~= self.keys.layout then
+			layouts[i] = layout
+			i = i + 1
+		end
+	end
+
+	return layouts
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+-- Deletes a layout, except current.
+function FunctionsL:DeleteLayout(layoutename)
+----------------------------------------------------------------------------------------------------
+	if not layoutename or type(layoutename) ~= "string"	then error(("DeleteLayout(layoutename): 'layoutename' - string expected."), 2) end
+	if not self.database.layouts[layoutename]			then error(("DeleteLayout error: %q does not exist."):format(layoutename), 2) end
+	if layoutename == self.keys.layout					then error(("Current layout, Use ResetLayout() instead."), 2) end
+
+	-- Remove the profile
+	self.database.layouts[layoutename] = nil
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+-- Clear the current layout.
+function FunctionsL:ResetLayout()
+----------------------------------------------------------------------------------------------------
+	self.keys.locked = true
+
+		-- Clear the current layout
+		for k,v in pairs(self.layout) do self.layout[k] = nil end
+		if addon.onNewLayout then securecall(addon.onNewLayout, addon, self.keys.dbname) end
+
+	self.keys.locked = false
+	if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, self.keys.dbname) end
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+-- Replace current layout by another.
+function FunctionsL:CopyLayout(from)
+----------------------------------------------------------------------------------------------------
+	if not from or type(from) ~= "string"	then error(("CopyLayout(from): 'from' - string expected."), 2) end
+	if not self.database.layouts[from]		then error(("CopyLayout error: %q does not exist."):format(from), 2) end
+	if from == self.keys.layout				then return end	--Source and destination are the same
+
+	self.keys.locked = true
+
+		-- Clear the destination layout
+		for k,v in pairs(self.layout) do self.layout[k] = nil end
+
+		-- Copy the layout to current (no link)
+		copyTable(self.database.layouts[from], self.layout)
+
+	self.keys.locked = false
+	if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, self.keys.dbname) end
+end
+
+
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--										EDITMODE FRAMES
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+
+local Overlays = {}
+local CurrentIcon
+
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+-- Callback to know if a frame has been clicked while EditMode; all addons, not only System frames.
+local function onFrameClicked(frame)
+----------------------------------------------------------------------------------------------------
+	if not InCombatLockdown() then
+		if IconManager then IconManager:Hide() end
+
+		for editmodeframe,enabled in pairs(FoxDB.Frames) do
+			if enabled then
+				editmodeframe:SetMovable(false)
+				editmodeframe:ShowHighlighted()		-- Displays in white
+			end
+		end
+
+		if FoxDB.Frames[frame] then
+			EditModeManagerFrame:ClearSelectedSystem()
+			frame:ShowSelected(true)				-- Displays in yellow
+			frame:SetMovable(true)
+		end
+	end
+
+	if maindb then
+		if addon.onEditModeFrame then securecall(addon.onEditModeFrame, addon, frame, false) end
+	end
+end
+--hooksecurefunc(EditModeManagerFrame, 'SelectSystem', onFrameClicked)
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+-- Callback to know if an icon has been clicked while EditMode; all addons, not only our.
+local function onIconClicked(icon, closeonly)
+----------------------------------------------------------------------------------------------------
+	CurrentIcon = icon
+
+	if not InCombatLockdown() then
+		if IconManager then IconManager:Hide() end
+
+		-- Close the current system menu, if it exists. Taint if InCombat.
+		EditModeManagerFrame:ClearSelectedSystem()
+
+		if closeonly then return end
+
+		IconManager.Title:SetText(icon.label)
+		IconManager.Tooltip.Button:SetChecked(icon.Tooltip())
+		IconManager.Visibility.Button:SetChecked(icon.Visibility())
+		IconManager.MouseOn.Slider:SetValue(icon.Alpha1())
+		IconManager.MouseOut.Slider:SetValue(icon.Alpha2())
+		IconManager.Offset.Slider:SetValue(icon.Offset())
+
+		IconManager:Show()
+		IconManager:SetSize(383, 239)
+	end
+
+	if maindb then
+		if addon.onEditModeFrame then securecall(addon.onEditModeFrame, addon, icon, true) end
+	end
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+function FunctionsL:RegisterSystemFrame(frame)
+----------------------------------------------------------------------------------------------------
+	FoxDB.Frames[frame] = true
+	frame:SetScript('OnMouseDown', onFrameClicked)
+	if EditModeOn then frame:Show() else frame:Hide() end
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+function FunctionsL:UnregisterSystemFrame(frame)
+----------------------------------------------------------------------------------------------------
+	FoxDB.Frames[frame] = false
+	frame:SetScript('OnMouseDown', nil)
+	frame:Hide()
 end
 
 
@@ -1391,26 +706,63 @@ local Snap = EditModeManagerFrame.EnableSnapCheckButton
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
+local firstOverlays = true
 local function onEditModeEnter()
 ----------------------------------------------------------------------------------------------------
 	EditModeOn = true
-	for editmodeframe,enabled in pairs(FoxDB.db_frames) do
-		if enabled then
-			securecallfunction(editmodeframe.Show, editmodeframe)
-			securecallfunction(editmodeframe.ShowHighlighted, editmodeframe)		-- Displays in white
+
+	if not InCombatLockdown() then
+
+		if firstOverlays then
+		firstOverlays = false
+
+			local frame = EnumerateFrames()
+			while frame do
+				if frame.selectedTextureKit == "editmode-actionbar-selected" then
+					if not Overlays[frame] then
+						Overlays[frame] = true
+						if not FoxDB.Frames[frame] then
+							frame:HookScript('OnMouseDown', function(self) onFrameClicked(self) end)
+						end
+					end
+				else
+					if not Overlays[frame] then
+						local name = frame:GetDebugName()
+						if name:match("FoxDB_Icon_") then
+							Overlays[frame] = true
+							if name ~= "FoxDB_Icon_"..addonname then
+								frame:HookScript('OnClick', function(self, btn) if EditModeOn then securecall(onIconClicked, self, true) end end)
+							end
+						end
+					end
+				end
+				frame = EnumerateFrames(frame)
+			end
+		end
+
+		for editmodeframe,enabled in pairs(FoxDB.Frames) do
+			if enabled then
+				securecall(editmodeframe.Show, editmodeframe)
+				securecall(editmodeframe.ShowHighlighted, editmodeframe)		-- Displays in white
+			end
+		end
+
+		local icon = maindb and maindb.icon and maindb.icon.button
+		if icon then
+			icon:EnableMouseWheel(true)
+			icon:SetScript("OnMouseWheel", function(self, wheel) securecall(icon.onMouseWheel, icon, wheel) end)
+			icon:SetFrameStrata("DIALOG")
+			icon:Show()
 		end
 	end
+
 	local grid = Grid:IsControlChecked() or false
 	local snap = Snap:IsControlChecked() or false
-	for db in pairs(FoxDB.db_registry) do
+	for db in pairs(FoxDB.Registry) do
 		db.keys.editmode = true
-		if db.onEditModeEnter then securecallfunction(db.onEditModeEnter, grid, snap) end
 	end
-	for _,button in pairs(FoxDB.db_icons) do
-		button:EnableMouseWheel(true)
-		button:SetScript("OnMouseWheel", function(self, wheel) securecallfunction(button.onMouseWheel, button, wheel) end)
-		button:SetFrameStrata("DIALOG")
-		button:Show()
+	if maindb then
+		if addon.onEditModeEnter then securecall(addon.onEditModeEnter, addon, grid, snap) end
 	end
 end
 EventRegistry:RegisterCallback("EditMode.Enter", onEditModeEnter)
@@ -1419,8 +771,8 @@ EventRegistry:RegisterCallback("EditMode.Enter", onEditModeEnter)
 local function onEditModeGrid()
 ----------------------------------------------------------------------------------------------------
 	local grid = Grid:IsControlChecked() or false
-	for db in pairs(FoxDB.db_registry) do
-		if db.onEditModeGrid then securecallfunction(db.onEditModeGrid, grid) end
+	if maindb then
+		if addon.onEditModeGrid then securecall(addon.onEditModeGrid, addon, grid) end
 	end
 end
 hooksecurefunc(EditModeManagerFrame.ShowGridCheckButton, "OnCheckButtonClick", onEditModeGrid)
@@ -1429,8 +781,9 @@ hooksecurefunc(EditModeManagerFrame.ShowGridCheckButton, "OnCheckButtonClick", o
 local function onEditModeSnap()
 ----------------------------------------------------------------------------------------------------
 	local snap = Snap:IsControlChecked() or false
-	for db in pairs(FoxDB.db_registry) do
-		if db.onEditModeGrid then securecallfunction(db.onEditModeSnap, snap) end
+
+	if maindb then
+		if dbaddononEditModeGrid then securecall(addon.onEditModeSnap, addon, snap) end
 	end
 end
 hooksecurefunc(EditModeManagerFrame.EnableSnapCheckButton, "OnCheckButtonClick", onEditModeSnap)
@@ -1439,24 +792,34 @@ hooksecurefunc(EditModeManagerFrame.EnableSnapCheckButton, "OnCheckButtonClick",
 local function onEditModeExit()
 ----------------------------------------------------------------------------------------------------
 	EditModeOn = false
-	for editmodeframe,enabled in pairs(FoxDB.db_frames) do
-		if enabled then
-			editmodeframe:Hide()
+
+	if not InCombatLockdown() then
+		if IconManager then IconManager:Hide() end
+
+		for editmodeframe,enabled in pairs(FoxDB.Frames) do
+			if enabled then
+				editmodeframe:Hide()
+			end
+		end
+
+		local icon = maindb and maindb.icon and maindb.icon.button
+		if icon then
+			icon:EnableMouseWheel(false)
+			icon:SetScript("OnMouseWheel", nil)
+			icon:SetFrameStrata("MEDIUM")
+			if icon:Visibility() == false then icon:Hide() end
 		end
 	end
-	for db in pairs(FoxDB.db_registry) do
+
+	for db in pairs(FoxDB.Registry) do
 		db.keys.editmode = false
-		if db.onEditModeExit then securecallfunction(db.onEditModeExit) end
 	end
-	if IconManager then IconManager:Hide() end
-	for _,button in pairs(FoxDB.db_icons) do
-		button:EnableMouseWheel(false)
-		button:SetScript("OnMouseWheel", nil)
-		button:SetFrameStrata("MEDIUM")
-		if button:Visibility() == false then button:Hide() end
+	if maindb then
+		if addon.onEditModeExit then securecall(addon.onEditModeExit, addon) end
 	end
 end
 EventRegistry:RegisterCallback("EditMode.Exit", onEditModeExit)
+EventRegistry:RegisterFrameEventAndCallback("PLAYER_REGEN_DISABLED", onEditModeExit)
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 local function onLayoutSaved()
@@ -1466,7 +829,7 @@ local function onLayoutSaved()
 	local LayoutIndex = GetLayouts.activeLayout
 	local LayoutNumber = #Layouts + 2
 
-	if LayoutNumber == FoxDBLayoutNumber then					-- Filter other events of onLayoutUpdated()
+	if LayoutNumber == FoxDBLayoutNumber then		-- Filter other events of onLayoutUpdated()
 		local index = nil
 		for i = 1, LayoutNumber - 2 do
 			if Layouts[i].layoutName ~= FoxDBLayouts[i].layoutName then index = i end
@@ -1474,8 +837,8 @@ local function onLayoutSaved()
 		if index then
 			local oldname = FoxDBLayouts[index].layoutName
 			local newname = Layouts[index].layoutName
-			if index == FoxDBLayoutIndex - 2 then				-- If Current layout
-				for db in pairs(FoxDB.db_registry) do
+			if index == FoxDBLayoutIndex - 2 then	-- If Current layout
+				for db in pairs(FoxDB.Registry) do
 					db.keys.locked = true
 
 						-- Remove the new layout if exists
@@ -1498,7 +861,7 @@ local function onLayoutSaved()
 				end
 				FoxDBLayoutName = newname
 			else
-				for db in pairs(FoxDB.db_registry) do
+				for db in pairs(FoxDB.Registry) do
 					-- Remove the new layout if exists
 					db.database.layouts[newname] = nil
 
@@ -1510,12 +873,12 @@ local function onLayoutSaved()
 				end
 			end
 			FoxDBLayouts = Layouts
-			for db in pairs(FoxDB.db_registry) do
-				if db.onLayoutRenamed then securecallfunction(db.onLayoutRenamed) end
+			for db in pairs(FoxDB.Registry) do
+				if addon.onLayoutRenamed then securecall(addon.onLayoutRenamed, addon, db.keys.dbname) end
 			end
 		else
-			for db in pairs(FoxDB.db_registry) do
-				if db.onLayoutSaved then securecallfunction(db.onLayoutSaved) end
+			for db in pairs(FoxDB.Registry) do
+				if addon.onLayoutSaved then securecall(addon.onLayoutSaved, addon, db.keys.dbname) end
 			end
 		end
 	end
@@ -1531,9 +894,9 @@ local function onLayoutUpdated()
 	if LayoutIndex > 2 then LayoutName = Layouts[LayoutIndex - 2].layoutName elseif LayoutIndex == 2 then LayoutName = "Preset_Classic" else LayoutName = "Preset_Modern" end
 	local LayoutNumber = #Layouts + 2
 
-	if FoxDBLayoutName == nil then						-- Loading the layout while edit mode initialization
+	if FoxDBLayoutName == nil then					-- Loading the layout while edit mode initialization
 		if LayoutName then
-			for db in pairs(FoxDB.db_registry) do
+			for db in pairs(FoxDB.Registry) do
 				local created = false
 				db.keys.locked = true
 
@@ -1550,21 +913,21 @@ local function onLayoutUpdated()
 
 					-- Change keys.layout name
 					db.keys.layout = LayoutName
-					if created then if db.onNewLayout then securecallfunction(db.onNewLayout) end end
+					if created then if addon.onNewLayout then securecall(addon.onNewLayout, addon, db.keys.dbname) end end
 
 				db.keys.locked = false
 
 				if db.keys.newprofile then
-					if db.onNewProfile then securecallfunction(db.onNewProfile) end
+					if db.onNewProfile and db.keys.profiles and addon.onNewProfile then securecall(addon.onNewProfile, addon, db.keys.dbname) end
 					db.keys.newprofile = false
 				end
-				if db.onProfileChanged	then securecallfunction(db.onProfileChanged)	end
-				if db.onLayoutLoaded	then securecallfunction(db.onLayoutLoaded)		end
+				if db.keys.profiles and	addon.onProfileChanged	then securecall(addon.onProfileChanged, addon, db.keys.dbname)	end
+				if						addon.onLayoutLoaded	then securecall(addon.onLayoutLoaded, addon, db.keys.dbname)	end
 			end
 			FoxDBLayoutName = LayoutName
 		end
-	elseif LayoutNumber > FoxDBLayoutNumber then		-- Adding a layout swap automatically to it
-		for db in pairs(FoxDB.db_registry) do
+	elseif LayoutNumber > FoxDBLayoutNumber then	-- Adding a layout swap automatically to it
+		for db in pairs(FoxDB.Registry) do
 			db.keys.locked = true
 				-- Remove the current layout
 				db.layout = nil
@@ -1582,11 +945,11 @@ local function onLayoutUpdated()
 				db.keys.layout = LayoutName
 
 			db.keys.locked = false
-			if db.onLayoutChanged then securecallfunction(db.onLayoutChanged) end
+			if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, db.keys.dbname) end
 		end
-	elseif LayoutNumber < FoxDBLayoutNumber then		-- Romoving a layout swap automatically to a preset if we were on that layout, else we stay on actual layout
-		if LayoutNumber == 2 then						-- If the layout was the last non preset layout
-			for db in pairs(FoxDB.db_registry) do
+	elseif LayoutNumber < FoxDBLayoutNumber then	-- Romoving a layout swap automatically to a preset if we were on that layout, else we stay on actual layout
+		if LayoutNumber == 2 then					-- If the layout was the last non preset layout
+			for db in pairs(FoxDB.Registry) do
 				db.keys.locked = true
 
 					-- Remove the current layout
@@ -1611,12 +974,12 @@ local function onLayoutUpdated()
 					db.keys.layout = LayoutName
 
 				db.keys.locked = false
-				if db.onLayoutChanged then securecallfunction(db.onLayoutChanged) end
+				if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, db.keys.dbname) end
 			end
 		else	
 			local nameold = nil
 			local Layoutfound = false
-			for index = 3, LayoutNumber do				-- Else if not latest non preset layout
+			for index = 3, LayoutNumber do			-- Else if not latest non preset layout
 				if not Layoutfound then
 					nameold = FoxDBLayouts[index - 2].layoutName
 					local namenew = Layouts[index - 2].layoutName
@@ -1626,10 +989,10 @@ local function onLayoutUpdated()
 					end
 				end
 			end
-			if not Layoutfound then						-- Else if the latest non preset layout
+			if not Layoutfound then					-- Else if the latest non preset layout
 				nameold = FoxDBLayouts[FoxDBLayoutNumber - 2].layoutName
 			end
-			for db in pairs(FoxDB.db_registry) do
+			for db in pairs(FoxDB.Registry) do
 				db.keys.locked = true
 
 					-- Remove the current layout
@@ -1654,11 +1017,11 @@ local function onLayoutUpdated()
 					db.keys.layout = LayoutName
 
 				db.keys.locked = false
-				if db.onLayoutChanged then securecallfunction(db.onLayoutChanged) end
+				if db.onLayoutChanged then securecall(db.onLayoutChanged) end
 			end
 		end
 	else
-		for db in pairs(FoxDB.db_registry) do
+		for db in pairs(FoxDB.Registry) do
 			db.keys.locked = true
 
 				-- Remove the current layout
@@ -1680,7 +1043,7 @@ local function onLayoutUpdated()
 				db.keys.layout = LayoutName
 
 			db.keys.locked = false
-			if db.onLayoutChanged then securecallfunction(db.onLayoutChanged) end
+			if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, db.keys.dbname) end
 		end
 	end
 
@@ -1691,88 +1054,17 @@ local function onLayoutUpdated()
 end
 EventRegistry:RegisterFrameEventAndCallback("EDIT_MODE_LAYOUTS_UPDATED", onLayoutUpdated, FoxDB)
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
 local function onPlayerLogout()
-	for db in pairs(FoxDB.db_registry) do
-		for _,v in pairs(db) do if type(v) == "table" and v ~= db.profile and v ~= db.layout then clearTable(v) end end
+----------------------------------------------------------------------------------------------------
+	for db in pairs(FoxDB.Registry) do
+		if addon.onPlayerLogout then securecall(addon.onPlayerLogout, addon, db.keys.dbname) end
+		for _,v in pairs(db) do
+			if type(v) == "table" and v ~= db.profile and v ~= db.layout then clearTable(v) end
+		end
 	end
 end
 EventRegistry:RegisterFrameEventAndCallback("PLAYER_LOGOUT", onPlayerLogout, FoxDB)
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---										EDITMODE FRAMES
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
--- Callback to know if a frame has been clicked while EditMode; all addons, not only System frames.
-local function onFrameClicked(frame)
-----------------------------------------------------------------------------------------------------
-	if IconManager then IconManager:Hide() end
-
-	for editmodeframe,enabled in pairs(FoxDB.db_frames) do
-		if enabled then
-			editmodeframe:SetMovable(false)
-			editmodeframe:ShowHighlighted()		-- Displays in white
-		end
-	end
-
-	if FoxDB.db_frames[frame] then
-		-- Close the current system menu, if it exists. Taint if InCombat.
-		if not InCombatLockdown() then EditModeManagerFrame:ClearSelectedSystem() end
-		frame:ShowSelected(true)				-- Displays in yellow
-		frame:SetMovable(true)
-	end
-
-	for db in pairs(FoxDB.db_registry) do
-		if db.onEditModeFrame then securecallfunction(db.onEditModeFrame, frame, false) end
-	end
-end
-hooksecurefunc(EditModeManagerFrame, 'SelectSystem', onFrameClicked)
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
--- Callback to know if an iconn has been clicked while EditMode.
-local function onEditModeButtonClicked(icon, closeonly, ...)
-----------------------------------------------------------------------------------------------------
-	if IconManager then IconManager:Hide() end
-
-	-- Close the current system menu, if it exists. Taint if InCombat.
-	if not InCombatLockdown() then EditModeManagerFrame:ClearSelectedSystem() end
-	if closeonly then return end
-
-	if icon ~= IconManager.MinimapIcon then
-		IconManager.MinimapIcon = icon
-		IconManager.Title:SetText(icon.label)
-		IconManager.Tooltip.Button:SetChecked(icon.Tooltip())
-		IconManager.Visibility.Button:SetChecked(icon.Visibility())
-		IconManager.MouseOn.Slider:SetValue(icon.Alpha1())
-		IconManager.MouseOut.Slider:SetValue(icon.Alpha2())
-		IconManager.Offset.Slider:SetValue(icon.Offset())
-	end
-	IconManager:Show()
-	IconManager:SetSize(383, 239)
-
-	for db in pairs(FoxDB.db_registry) do
-		if db.onEditModeFrame then securecallfunction(db.onEditModeFrame, icon, true) end
-	end
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FunctionsDB:RegisterSystemFrame(frame)
-----------------------------------------------------------------------------------------------------
-	FoxDB.db_frames[frame] = true
-	frame:SetScript('OnMouseDown', onFrameClicked)
-	if EditModeOn then frame:Show() else frame:Hide() end
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FunctionsDB:UnregisterSystemFrame(frame)
-----------------------------------------------------------------------------------------------------
-	FoxDB.db_frames[frame] = false
-	frame:SetScript('OnMouseDown', nil)
-	frame:Hide()
-end
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -1782,81 +1074,103 @@ end
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
+-- Populate the table with all FoxDB minimap icons.
+local GetAllIconsfirst = true
+local function GetAllIcons()
+----------------------------------------------------------------------------------------------------
+	GetAllIconsfirst = nil
+
+	local frame = EnumerateFrames()
+	while frame do
+		local name = frame:GetDebugName()
+		if name:match("FoxDB_Icon_") then
+			insert(FoxDB.Icons, frame)
+		end
+		frame = EnumerateFrames(frame)
+	end
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
 -- Returns the table with all FoxDB minimap icons.
 function FunctionsDB:GetIcons()
 ----------------------------------------------------------------------------------------------------
-	return FoxDB.db_icons
+	if GetAllIconsfirst then GetAllIcons() end
+
+	return FoxDB.Icons
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 -- Sends the next icon from current icon.
 function FunctionsDB:GetNextIcon()
 ----------------------------------------------------------------------------------------------------
+	if GetAllIconsfirst then GetAllIcons() end
 	if not EditModeOn then return end
 
-	local found = 0
-	local first = true
-	local icon1 = nil
-	for index,icon in pairs(FoxDB.db_icons) do
-		if first == true then icon1 = icon first = false end
-		if found == 1 then
-			found = 2
-			onEditModeButtonClicked(icon)
-			break
-		elseif icon == IconManager.MinimapIcon then
-			found = 1
+	local nicons = #FoxDB.Icons
+	if nicons < 2 then return end
+
+	if FoxDB.Icons[nicons] == CurrentIcon then
+		securecall(onIconClicked, FoxDB.Icons[1])
+	else
+		local found
+		for i=1,nicons do
+			local icon = FoxDB.Icons[i]
+			if found then
+				securecall(onIconClicked, icon)
+			elseif icon == CurrentIcon then
+				found = true
+			end
 		end
 	end
-	if found ~= 2 and icon1 then onEditModeButtonClicked(icon1) end
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 function FunctionsDB:IconSquare(isSquare)
 ----------------------------------------------------------------------------------------------------
-	for label,button in pairs(FoxDB.db_icons) do
-		securecallfunction(button.Square, isSquare)
+	if GetAllIconsfirst then GetAllIcons() end
+
+	for _,icon in next, FoxDB.Icons do
+		securecallfunction(icon.Square, isSquare)
 	end
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 function FunctionsDB:IconStart()
 ----------------------------------------------------------------------------------------------------
-	if not self.icon then self.icon = {} end
-	local IconName = "FoxDB_Icon_"..(self.icon.label or "")
+	local IconName = "FoxDB_Icon_"..addonname
+	local icon = self.icon
+	icon.label = icon.label or addonname
 
 	-- Errors
-	if not self.icon.label								then error("Cannot start icon without label, use self.db.icon.label =") end
-	if type(self.icon.label) ~= "string"				then error("Cannot start icon without icon label, string expected") end
-	if FoxDB.db_icons[IconName]							then error("The icon's unique identifier ".. self.icon.label .." is already registered.") return end
-	if not self.icon.file								then error("Can't start icon without icon object, use self.db.icon.file =") end
+	if not icon.file then error("Can't start icon without icon object, use self.db.icon.file =") end
 
 	-- Variables
-	if type(self.icon.tooltip)		~= "boolean"	then self.icon.tooltip		= true							end
-	if type(self.icon.visible)		~= "boolean"	then self.icon.visible		= true							end
-	if type(self.icon.alpha1)		~= "number"		then self.icon.alpha1		= 0.8							end
-	if type(self.icon.alpha2)		~= "number"		then self.icon.alpha2		= min(0.6, self.icon.alpha1)	end
-	if type(self.icon.scale)		~= "number"		then self.icon.scale		= 0.9							end
-	if type(self.icon.square)		~= "boolean"	then self.icon.square		= false							end
-	if type(self.icon.angle)		~= "number"		then self.icon.angle		= rand(-pi, pi)					end
-	if type(self.icon.offset)		~= "number"		then self.icon.offset		= 0								end
-	if type(self.icon.line1)		~= "string"		then self.icon.line1		= ""							end
-	if type(self.icon.line2)		~= "string"		then self.icon.line2		= ""							end
-	if type(self.icon.line3)		~= "string"		then self.icon.line3		= ""							end
+	if type(icon.tooltip)	~= "boolean"	then icon.tooltip	= true					end
+	if type(icon.visible)	~= "boolean"	then icon.visible	= true					end
+	if type(icon.alpha1)	~= "number"		then icon.alpha1	= 0.8					end
+	if type(icon.alpha2)	~= "number"		then icon.alpha2	= min(0.6, icon.alpha1)	end
+	if type(icon.scale)		~= "number"		then icon.scale		= 0.9					end
+	if type(icon.square)	~= "boolean"	then icon.square	= false					end
+	if type(icon.angle)		~= "number"		then icon.angle		= rand(-pi, pi)			end
+	if type(icon.offset)	~= "number"		then icon.offset	= 0						end
+	if type(icon.line1)		~= "string"		then icon.line1		= ""					end
+	if type(icon.line2)		~= "string"		then icon.line2		= ""					end
+	if type(icon.line3)		~= "string"		then icon.line3		= ""					end
 
 	-- Button
-	local button = self.iconinuse or CreateFrame("Button", IconName, UIParent)
-	button.label = self.icon.label
+	local button = FoxDB.Icon or CreateFrame("Button", IconName, UIParent)
+	button.label = icon.label
 	button:SetSize(30, 30)
 	button:SetFrameStrata("MEDIUM")
 	button:SetFixedFrameStrata(false)
 	button:SetFrameLevel(1002)
 	button:SetFixedFrameLevel(true)
 	-- Icon
-	button.icon = button.icon or button:CreateTexture(IconName.."_icon", "BACKGROUND")
-	button.icon:SetSize(25, 25)
-	button.icon:SetPoint("CENTER", 0.34, 0)
-	button.icon:SetTexture(self.icon.file)
-	button.icon:SetMask("Interface\\Masks\\CircleMaskScalable")
+	button.texture = button.icon or button:CreateTexture(IconName.."_icon", "BACKGROUND")
+	button.texture:SetSize(25, 25)
+	button.texture:SetPoint("CENTER", 0.34, 0)
+	button.texture:SetTexture(icon.file)
+	button.texture:SetMask("Interface\\Masks\\CircleMaskScalable")
 	-- Normal
 	button.normal = button.normal or button:CreateTexture(IconName.."_normal", "BORDER")
 	button.normal:SetSize(30, 30)
@@ -1871,44 +1185,50 @@ function FunctionsDB:IconStart()
 	button.highlight:SetTexture("Interface\\COMMON\\CommonRoundHighlight")
 
 	-- Tooltip
-	button.Tooltip = function(tooltip) if type(tooltip) ~= "boolean" then return self.icon.tooltip else self.icon.tooltip = tooltip end end
+	button.Tooltip = function(tooltip) if type(tooltip) ~= "boolean" then return icon.tooltip else icon.tooltip = tooltip end end
 	button.onIconEnter = function(btn)
 		if not btn then return end
-		btn:SetAlpha(self.icon.alpha1)
-		if GameTooltip and (self.icon.tooltip == true or EditModeOn == true) then
+		btn:SetAlpha(icon.alpha1)
+		if GameTooltip and (icon.tooltip or EditModeOn) then
 			GameTooltip:ClearLines()
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			GameTooltip:AddLine(self.icon.label, 0, 1, 0)
-			if EditModeOn == true then
-				GameTooltip:AddDoubleLine("|cff69ccf0Scale:|r",	("|cffffffff%s|r"):format(self.icon.scale))
-				if self.icon.visible == false then			GameTooltip:AddLine(L"Icon is not visible", 1, 1, 1) end
+			GameTooltip:AddLine(icon.label, 0, 1, 0)
+			if EditModeOn then
+				GameTooltip:AddDoubleLine("|cff69ccf0Scale:|r",	("|cffffffff%s|r"):format(icon.scale))
+				if icon.visible == false then
+					GameTooltip:AddLine(L"Icon is not visible", 1, 1, 1)
+				end
 			end
-			if self.icon.tooltip == true then
-				if type(self.icon.line1) == "string" then	GameTooltip:AddDoubleLine("|cff69ccf0Left:|r", 	("|cffffffff%s|r"):format(self.icon.line1)) end
-				if type(self.icon.line2) == "string" then	GameTooltip:AddDoubleLine("|cff69ccf0Middle:|r",("|cffffffff%s|r"):format(self.icon.line2)) end
-				if type(self.icon.line3) == "string" then	GameTooltip:AddDoubleLine("|cff69ccf0Right:|r",	("|cffffffff%s|r"):format(self.icon.line3)) end
+			if icon.tooltip then
+				local line1 = type(icon.line1) == "string" and icon.line1 ~= ""
+				local line2 = type(icon.line2) == "string" and icon.line2 ~= ""
+				local line3 = type(icon.line3) == "string" and icon.line3 ~= ""
+				if not (line1 or line2 or line3) then return end
+				if line1 then GameTooltip:AddDoubleLine("|cff69ccf0Left:|r", 	("|cffffffff%s|r"):format(icon.line1)) end
+				if line2 then GameTooltip:AddDoubleLine("|cff69ccf0Middle:|r",	("|cffffffff%s|r"):format(icon.line2)) end
+				if line3 then GameTooltip:AddDoubleLine("|cff69ccf0Right:|r",	("|cffffffff%s|r"):format(icon.line3)) end
 			else
-															GameTooltip:AddLine(L"Tooltip deactivated", 1, 1, 1)
+				GameTooltip:AddLine(L"Tooltip deactivated", 1, 1, 1)
 			end
 			GameTooltip:Show()
 		end
 	end
 	button.onIconLeave = function(btn)
 		if not btn then return end
-		btn:SetAlpha(self.icon.alpha2)
-		if (self.icon.tooltip == true or EditModeOn == true) and GameTooltip then GameTooltip:Hide() end
+		btn:SetAlpha(icon.alpha2)
+		if (icon.tooltip or EditModeOn == true) and GameTooltip then if GameTooltip then GameTooltip:Hide() end end
 	end
-	button:SetScript("OnEnter", function(btn) securecallfunction(button.onIconEnter, btn) end)
-	button:SetScript("OnLeave", function(btn) securecallfunction(button.onIconLeave, btn) end)
+	button:SetScript("OnEnter", function(btn) securecall(button.onIconEnter, btn) end)
+	button:SetScript("OnLeave", function(btn) securecall(button.onIconLeave, btn) end)
 
 	-- Visibility
 	button.Visibility = function(visible)
-			if visible ~= "_" then if type(visible) ~= "boolean" then return self.icon.visible else self.icon.visible = visible end end
-			if self.onIconVisibility then securecallfunction(self.onIconVisibility, self.icon.visible) end
-			if EditModeOn == true then return end
-			if self.icon.visible == true then
+			if visible ~= "_" then if type(visible) ~= "boolean" then return icon.visible else icon.visible = visible end end
+			if addon.onIconVisibility then securecall(addon.onIconVisibility, addon, icon.visible) end
+			if EditModeOn then return end
+			if icon.visible then
 				button:Show()
-				securecallfunction(button.Minimap)
+				securecall(button.Minimap)
 			else
 				button:Hide()
 			end
@@ -1916,22 +1236,22 @@ function FunctionsDB:IconStart()
 
 	-- Transparency
 	button.Alpha1 = function(alpha1)
-			if alpha1 ~= "_" then if type(alpha1) ~= "number" then return self.icon.alpha1 else self.icon.alpha1 = min(max(alpha1, 0.2), 1) end end
-			self.icon.alpha2 = min(max(self.icon.alpha2, 0), self.icon.alpha1)
-			button:SetAlpha(self.icon.alpha1)
+			if alpha1 ~= "_" then if type(alpha1) ~= "number" then return icon.alpha1 else icon.alpha1 = min(max(alpha1, 0.2), 1) end end
+			icon.alpha2 = min(max(icon.alpha2, 0), icon.alpha1)
+			button:SetAlpha(icon.alpha1)
 		end
 	button.Alpha2 = function(alpha2)
-			if alpha2 ~= "_" then if type(alpha2) ~= "number" then return self.icon.alpha2 else self.icon.alpha2 = min(max(alpha2, 0), 1) end end
-			self.icon.alpha1 = min(max(self.icon.alpha1, self.icon.alpha2), 1)
-			button:SetAlpha(self.icon.alpha2)
+			if alpha2 ~= "_" then if type(alpha2) ~= "number" then return icon.alpha2 else icon.alpha2 = min(max(alpha2, 0), 1) end end
+			icon.alpha1 = min(max(icon.alpha1, icon.alpha2), 1)
+			button:SetAlpha(icon.alpha2)
 		end
 
 	-- Scale
 	button.Scale = function(scale)
-			if scale ~= "_" then if type(scale) ~= "number" then return self.icon.scale else self.icon.scale = min(max(scale, 0.8), 3) end end
+			if scale ~= "_" then if type(scale) ~= "number" then return icon.scale else icon.scale = min(max(scale, 0.8), 3) end end
 			button:ClearAllPoints()
-			button:SetScale(self.icon.scale*MinimapCluster:GetScale()*Minimap:GetScale())
-			securecallfunction(button.Minimap)
+			button:SetScale(icon.scale*MinimapCluster:GetScale()*Minimap:GetScale())
+			securecall(button.Minimap)
 		end
 
 	-- Position
@@ -1941,32 +1261,32 @@ function FunctionsDB:IconStart()
 	button:RegisterForDrag("LeftButton")
 	button.Minimap = function()
 			if not Minimap then button:ClearAllPoints() button:Hide() end
-			self.icon.angle = min(max(self.icon.angle, -pi), pi)
-			local w = Minimap:GetWidth()/2	+ self.icon.offset
-			local h = Minimap:GetHeight()/2	+ self.icon.offset
-			local x = cos(self.icon.angle)*w
-			local y = sin(self.icon.angle)*h
-			if self.icon.square == true then
+			icon.angle = min(max(icon.angle, -pi), pi)
+			local w = Minimap:GetWidth()/2	+ icon.offset
+			local h = Minimap:GetHeight()/2	+ icon.offset
+			local x = cos(icon.angle)*w
+			local y = sin(icon.angle)*h
+			if icon.square then
 				x = max(-w, min(sqrt(2)*x, w))
 				y = max(-h, min(sqrt(2)*y, h))
 			end
 			button:ClearAllPoints()
 			local scale = button:GetEffectiveScale()
-			button:SetPoint("CENTER", Minimap, "CENTER", x/self.icon.scale, y/self.icon.scale)
+			button:SetPoint("CENTER", Minimap, "CENTER", x/icon.scale, y/icon.scale)
 		end
 	button.Square = function(square)
-			if square ~= "_" then if type(square) ~= "boolean" then return self.icon.square
+			if square ~= "_" then if type(square) ~= "boolean" then return icon.square
 				else
-					self.icon.square = square
-					securecallfunction(button.Scale, "_")
+					icon.square = square
+					securecall(button.Scale, "_")
 					return
 				end
 			end
-			securecallfunction(button.Minimap)
+			securecall(button.Minimap)
 		end
 	button.Offset = function(offset)
-			if offset ~= "_" then if type(offset) ~= "number" then return self.icon.offset else self.icon.offset = min(max(offset, -35), 35) end end
-			securecallfunction(button.Minimap)
+			if offset ~= "_" then if type(offset) ~= "number" then return icon.offset else icon.offset = min(max(offset, -35), 35) end end
+			securecall(button.Minimap)
 		end
 	button.onReceiveDrag = function(btn)
 		local x, y = GetCursorPosition()
@@ -1974,14 +1294,14 @@ function FunctionsDB:IconStart()
 			local scale = Minimap:GetEffectiveScale()
 			local z, t = Minimap:GetCenter()
 			z, t = z*scale, t*scale
-			self.icon.angle = atan2(y-t, x-z)
-			securecallfunction(button.Minimap)
+			icon.angle = atan2(y-t, x-z)
+			securecall(button.Minimap)
 		end
 	end
 	button.onDragStart = function(btn)
-			if self.icon.tooltip then GameTooltip:Hide() end
-			if EditModeOn == true then securecallfunction(onEditModeButtonClicked, button, true) end
-			button:SetScript("OnUpdate", function(self) if self.onReceiveDrag then securecallfunction(self.onReceiveDrag, button) end end)
+			if icon.tooltip then if GameTooltip then GameTooltip:Hide() end end
+			if EditModeOn then securecall(onIconClicked, button, true) end
+			button:SetScript("OnUpdate", function(self) if self.onReceiveDrag then securecall(self.onReceiveDrag, button) end end)
 			button:StartMoving()
 		end
 	button.onDragStop = function(btn)
@@ -1989,53 +1309,48 @@ function FunctionsDB:IconStart()
 			button:SetScript("OnUpdate", nil)
 		end
 	button.onEditModeEnter = function(btn)
-			button:SetScript("OnDragStart", function(self) if self.onDragStart then securecallfunction(self.onDragStart, button) end end)
-			button:SetScript("OnDragStop", function(self) if self.onDragStop then securecallfunction(self.onDragStop, button) end end)
+			button:SetScript("OnDragStart", function(self) if self.onDragStart then securecall(self.onDragStart, button) end end)
+			button:SetScript("OnDragStop", function(self) if self.onDragStop then securecall(self.onDragStop, button) end end)
 		end
 	button.onEditModeExit = function(btn)
 			button:SetScript("OnDragStart", nil)
 			button:SetScript("OnDragStop", nil)
 		end
-	EventRegistry:RegisterCallback("EditMode.Enter", function() button:onEditModeEnter() end, button)
-	EventRegistry:RegisterCallback("EditMode.Exit", function() button:onEditModeExit() end, button)
+	EventRegistry:RegisterCallback("EditMode.Enter", button.onEditModeEnter, button)
+	EventRegistry:RegisterCallback("EditMode.Exit", button.onEditModeExit, button)
 
 	-- Mouse
-	if self.onIconLeftClick		then button.onIconLeftClick		= self.onIconLeftClick		end
-	if self.onIconRightClick	then button.onIconRightClick	= self.onIconRightClick		end
-	if self.onIconMiddleClick	then button.onIconMiddleClick	= self.onIconMiddleClick	end
 	button:RegisterForClicks("anyUp")
 	button:SetScript("OnClick", function(self, btn)
-			if		btn == "LeftButton"	then
-				if EditModeOn == true											then securecallfunction(onEditModeButtonClicked, button)
-				else								if self.onIconLeftClick		then securecallfunction(self.onIconLeftClick)		end
+			if EditModeOn														then securecall(onIconClicked, button)
+			else
+				if		btn == "LeftButton"		then if addon.onIconLeftClick	then securecall(addon.onIconLeftClick,		addon) end
+				elseif	btn == "RightButton"	then if addon.onIconRightClick	then securecall(addon.onIconRightClick,		addon) end
+				elseif	btn == "MiddleButton"	then if addon.onIconMiddleClick	then securecall(addon.onIconMiddleClick,	addon) end
 				end
-			elseif	btn == "RightButton"	then	if self.onIconRightClick	then securecallfunction(self.onIconRightClick)		end
-			elseif	btn == "MiddleButton"	then	if self.onIconMiddleClick	then securecallfunction(self.onIconMiddleClick)		end
 			end
 		end)
 	button.onMouseWheel = function(btn, wheel)
-			securecallfunction(button.Scale, self.icon.scale+wheel*0.05)
-			securecallfunction(button.onIconEnter, button)
+			securecall(button.Scale, icon.scale+wheel*0.05)
+			securecall(button.onIconEnter, button)
 		end
 
 	-- Initialization
 	button.onInit = function()
 			EventRegistry:UnregisterFrameEventAndCallback("PLAYER_LOGIN", button)
-			securecallfunction(button.Visibility, "_")
-			securecallfunction(button.Alpha2, "_")
-			securecallfunction(button.Scale, "_")
-			securecallfunction(button.Offset, "_")
-			securecallfunction(button.Minimap)
-			Minimap:HookScript("OnSizeChanged",			function(mm, w, h)	securecallfunction(button.Scale, "_")		end)
-			MinimapCluster:HookScript("OnSizeChanged",	function(cl, w, h)	securecallfunction(button.Scale, "_")		end)
-			MinimapBackdrop:HookScript("OnHide",		function(bd)		securecallfunction(button.Hide, button)		end)
-			MinimapBackdrop:HookScript("OnShow",		function(bd)		securecallfunction(button.Visibility, "_")	end)
+			securecall(button.Visibility, "_")
+			securecall(button.Alpha2, "_")
+			securecall(button.Scale, "_")
+			securecall(button.Offset, "_")
+			securecall(button.Minimap)
+			Minimap:HookScript("OnSizeChanged",			function(mm, w, h)	securecall(button.Scale, "_")		end)
+			MinimapCluster:HookScript("OnSizeChanged",	function(cl, w, h)	securecall(button.Scale, "_")		end)
+			MinimapBackdrop:HookScript("OnHide",		function(bd)		securecall(button.Hide, button)		end)
+			MinimapBackdrop:HookScript("OnShow",		function(bd)		securecall(button.Visibility, "_")	end)
 		end
 	EventRegistry:RegisterFrameEventAndCallback("PLAYER_LOGIN", function() button:onInit() end, button)
 
-	self.iconinuse = button
-	FoxDB.db_icons[IconName] = button
-	IconManager.MinimapIcon = icon
+	FoxDB.Icon = button
 end
 
 
@@ -2046,15 +1361,16 @@ end
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
-FoxDB.IconManagerInitialized = FoxDB.IconManagerInitialized or false
+local IconManagerInitialized
 local function IconManagerInit()
 ----------------------------------------------------------------------------------------------------
-	if FoxDB.IconManagerInitialized then return else FoxDB.IconManagerInitialized = true end
+	if IconManagerInitialized then return else IconManagerInitialized = true end
 	EventRegistry:UnregisterFrameEventAndCallback("PLAYER_LOGIN", IconManager)
 
 	IconManager:SetSize(383, 239)
 	IconManager:SetFrameStrata("DIALOG")
 	IconManager:SetFrameLevel(200)
+	IconManager.heightPadding = 39
 	IconManager:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 	IconManager:EnableMouse(true)
 	IconManager:SetMovable(true)
@@ -2082,14 +1398,14 @@ local function IconManagerInit()
 	IconManager.Visibility.Label:SetWidth(145)
 	IconManager.Visibility.Label:SetText(L"Visible")
 	IconManager.Visibility:SetPoint("TOPLEFT", IconManager, "TOPLEFT", 20, -43)
-	IconManager.Visibility.Button:SetScript("OnClick", function(self, event, ...) securecallfunction(IconManager.MinimapIcon.Visibility, self:GetChecked()) end)
+	IconManager.Visibility.Button:SetScript("OnClick", function(self, event, ...) securecall(CurrentIcon.Visibility, self:GetChecked()) end)
 	IconManager.Visibility:Show()
 
 	IconManager.Tooltip = IconManager.Tooltip or CreateFrame("Frame", nil, IconManager, "EditModeSettingCheckboxTemplate")
 	IconManager.Tooltip.Label:SetWidth(165)
 	IconManager.Tooltip.Label:SetText(L"Tooltip")
 	IconManager.Tooltip:SetPoint("TOPLEFT", IconManager.Visibility, "TOPRIGHT", 0, 0)
-	IconManager.Tooltip.Button:SetScript("OnClick", function(self, event, ...) securecallfunction(IconManager.MinimapIcon.Tooltip, self:GetChecked()) end)
+	IconManager.Tooltip.Button:SetScript("OnClick", function(self, event, ...) securecall(CurrentIcon.Tooltip, self:GetChecked()) end)
 	IconManager.Tooltip:Show()
 
 	IconManager.MouseOn = IconManager.MouseOn or CreateFrame("Frame", nil, IconManager, "EditModeSettingSliderTemplate")
@@ -2101,14 +1417,16 @@ local function IconManagerInit()
 	IconManager.MouseOn.formatters = {}
 	IconManager.MouseOn.formatters[MinimalSliderWithSteppersMixin.Label.Right] = CreateMinimalSliderFormatter(
 			MinimalSliderWithSteppersMixin.Label.Right,
-			function(value) if value ~= -1 then 
-					securecallfunction(IconManager.MinimapIcon.Alpha1, value)
-					IconManager.MouseOut.Slider:SetValue(IconManager.MinimapIcon.Alpha2())
+			function(value) if value ~= -1 then
+					securecall(CurrentIcon.Alpha1, value)
+					IconManager.MouseOut.Slider:SetValue(CurrentIcon.Alpha2())
 					return ("%d%%"):format(value*100)
 				end
 			end)
 	IconManager.MouseOn.Slider:Init(-1, 0.2, 1, 80, IconManager.MouseOn.formatters)
-	IconManager.MouseOn.Slider.Slider:SetScript("OnMouseUp", function(self) securecallfunction(IconManager.MinimapIcon.Alpha2, "_") end)
+	IconManager.MouseOn.Slider.Slider:SetScript("OnMouseUp", function(self)
+			if not InCombatLockdown() then securecall(CurrentIcon.Alpha2, "_") end
+		end)
 	IconManager.MouseOn:Show()
 
 	IconManager.MouseOut = IconManager.MouseOut or CreateFrame("Frame", nil, IconManager, "EditModeSettingSliderTemplate")
@@ -2120,9 +1438,9 @@ local function IconManagerInit()
 	IconManager.MouseOut.formatters = {}
 	IconManager.MouseOut.formatters[MinimalSliderWithSteppersMixin.Label.Right] = CreateMinimalSliderFormatter(
 			MinimalSliderWithSteppersMixin.Label.Right,
-			function(value) if value ~= -1 then 
-					securecallfunction(IconManager.MinimapIcon.Alpha2, value)
-					IconManager.MouseOn.Slider:SetValue(IconManager.MinimapIcon.Alpha1())
+			function(value) if value ~= -1 then
+					securecall(CurrentIcon.Alpha2, value)
+					IconManager.MouseOn.Slider:SetValue(CurrentIcon.Alpha1())
 					return ("%d%%"):format(value*100)
 				end
 			end)
@@ -2139,24 +1457,24 @@ local function IconManagerInit()
 	IconManager.Offset.formatters[MinimalSliderWithSteppersMixin.Label.Right] = CreateMinimalSliderFormatter(
 			MinimalSliderWithSteppersMixin.Label.Right,
 			function(value)
-				if value ~= -1 then securecallfunction(IconManager.MinimapIcon.Offset, value) return value end
+				if value ~= -1 then securecall(CurrentIcon.Offset, value) return value end
 			end)
 	IconManager.Offset.Slider:Init(-1, -35, 35, 70, IconManager.Offset.formatters)
 	IconManager.Offset:Show()
 
-	IconManager.Divider2 = IconManager.Divider2 or CreateFrame("Frame", nil, IconManager)
-	IconManager.Divider2:SetSize(330,16)
-	IconManager.Divider2:SetPoint("TOPLEFT", IconManager.Offset, "BOTTOMLEFT", 0, 3)
-	IconManager.Divider2.divider = IconManager.Divider2:CreateTexture(nil, "ARTWORK")
-	IconManager.Divider2.divider:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-OnlineDivider") --389194
-	IconManager.Divider2.divider:SetSize(330,16)
-	IconManager.Divider2.divider:SetPoint("TOPLEFT")
-	IconManager.Divider2:Show()
+	IconManager.Divider = IconManager.Divider2 or CreateFrame("Frame", nil, IconManager)
+	IconManager.Divider:SetSize(330,16)
+	IconManager.Divider:SetPoint("TOPLEFT", IconManager.Offset, "BOTTOMLEFT", 0, 3)
+	IconManager.Divider.divider = IconManager.Divider:CreateTexture(nil, "ARTWORK")
+	IconManager.Divider.divider:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-OnlineDivider") --389194
+	IconManager.Divider.divider:SetSize(330,16)
+	IconManager.Divider.divider:SetPoint("TOPLEFT")
+	IconManager.Divider:Show()
 
 	IconManager.Next = IconManager.Next or CreateFrame("Button", nil, IconManager, "EditModeSystemSettingsDialogButtonTemplate")
 	IconManager.Next:SetWidth(330)
 	IconManager.Next:SetText(L"Next minimap icon")
-	IconManager.Next:SetPoint("TOPLEFT", IconManager.Divider2, "BOTTOMLEFT", -1, -2)	-- 0, -12 after divider if CheckBox
+	IconManager.Next:SetPoint("TOPLEFT", IconManager.Divider, "BOTTOMLEFT", -1, -2)	-- 0, -12 after divider if CheckBox
 	IconManager.Next:SetOnClickHandler(function() securecallfunction(FunctionsDB.GetNextIcon, FoxDB) end)
 	IconManager.Next:Show()
 end

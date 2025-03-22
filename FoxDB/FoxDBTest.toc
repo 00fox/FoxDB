@@ -1,0 +1,39 @@
+## Interface: 110002
+## Title: |cff1784d1FoxDB Test|r
+## Notes: FoxDB manages the SavedVariables of your addons, with EditMode included
+## Author: 00fox
+## X-Email: mail@00fox.com
+## X-Website: https://github.com/00fox/FoxDB
+## X-Feedback: issues@00fox.com
+## X-Category: Library
+## X-License: Artistic License 2.0
+## X-Credits: 
+## X-Curse-Project-ID: 1092056
+## Version: Release-11.1.0-0
+
+## X-WoWI-ID: 
+## X-Wago-ID: 
+
+## DefaultState: enabled
+## LoadOnDemand: 0
+## IconTexture: Interface\Icons\spell_shadow_brainwash
+## SavedVariables: FoxDBTestDB
+## AddonCompartmentFunc: FoxDBTest_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: FoxDBTest_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: FoxDBTest_OnAddonCompartmentLeave
+## RequiredDeps: 
+## OptionalDeps: 
+
+#@no-lib-strip@
+FoxDB.lua
+#@end-no-lib-strip@
+
+## Locale ##
+Locale.lua
+
+## Core ##
+FoxDBTest.xml
+FoxDBTest.lua
+
+## Parameters ##
+Settings.lua
