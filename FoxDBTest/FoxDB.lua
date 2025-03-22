@@ -1,5 +1,5 @@
 
---[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-0▓▓
+--[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-1▓▓
 ----------------------------------------------------------------------------------------------------
 --			FoxDB manages the SavedVariables of your addons, with EditMode included.
 ----------------------------------------------------------------------------------------------------
@@ -783,7 +783,7 @@ local function onEditModeSnap()
 	local snap = Snap:IsControlChecked() or false
 
 	if maindb then
-		if dbaddononEditModeGrid then securecall(addon.onEditModeSnap, addon, snap) end
+		if addon.onEditModeSnap then securecall(addon.onEditModeSnap, addon, snap) end
 	end
 end
 hooksecurefunc(EditModeManagerFrame.EnableSnapCheckButton, "OnCheckButtonClick", onEditModeSnap)
