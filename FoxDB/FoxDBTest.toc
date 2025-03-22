@@ -1,5 +1,5 @@
 ## Interface: 110002
-## Title: |cff1784d1FoxDB Test|r
+## Title: |cff1784d1FoxDB|r
 ## Notes: FoxDB manages the SavedVariables of your addons, with EditMode included
 ## Author: 00fox
 ## X-Email: mail@00fox.com
