@@ -61,7 +61,7 @@ Note:
 -  You manually start your addon, then load the Database, which will tell you when the layouts are ready;
     you therefore control everything with a feeling of the early days of wow.
 
-## The instructions can be found in the help that you will find in the settings of the example provided.
+## Complete instructions can be found in the help that you will find in the settings of the example provided.
 
 ## In your own addon you only need to include FoxDB.lua that's all.
 
