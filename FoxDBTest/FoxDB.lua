@@ -1,9 +1,9 @@
 
---[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-1▓▓
+--[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-2▓▓
 ----------------------------------------------------------------------------------------------------
 --			FoxDB manages the SavedVariables of your addons, with EditMode included.
 ----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓©2023-2025 00fox▓▓
 
 	 Written in clean language and optimized code,
 		 the goal of starting from scratch, in addition to EditMode,
@@ -56,7 +56,6 @@
 	 Note:
 		You manually start your addon, then load the Database, which will tell you when the layouts are ready;
 		 you therefore control everything with a feeling of the early days of wow.
-
 ]]
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -132,9 +131,10 @@ if locale == "deDE" then
 	FoxDB.L["Visible"]				= "Sichtbar"
 	FoxDB.L["Tooltip"]				= "Tooltip"
 	FoxDB.L["Mouse On"]				= "Maus an"
-	FoxDB.L["Mouse Out"]				= "Mouse Out"
+	FoxDB.L["Mouse Out"]			= "Mouse Out"
 	FoxDB.L["Offset"]				= "Versatz"
-	FoxDB.L["Next minimap icon"]		= "Nächstes Minikartensymbol"
+	FoxDB.L["Scale"]				= "Skala"
+	FoxDB.L["Next minimap icon"]	= "Nächstes Minikartensymbol"
 
 elseif locale == "itIT" then
 	FoxDB.L["Icon is not visible"]	= "L'icona non è visibile"
@@ -142,9 +142,10 @@ elseif locale == "itIT" then
 	FoxDB.L["Visible"]				= "Visibile"
 	FoxDB.L["Tooltip"]				= "Descrizione"
 	FoxDB.L["Mouse On"]				= "Mouse acceso"
-	FoxDB.L["Mouse Out"]				= "Mouse fuori"
+	FoxDB.L["Mouse Out"]			= "Mouse fuori"
 	FoxDB.L["Offset"]				= "Compensare"
-	FoxDB.L["Next minimap icon"]		= "Icona successiva sulla minimappa"
+	FoxDB.L["Scale"]				= "Scala"
+	FoxDB.L["Next minimap icon"]	= "Icona successiva sulla minimappa"
 
 elseif locale == "esES" or locale == "esMX" then
 	FoxDB.L["Icon is not visible"]	= "El icono no es visible"
@@ -152,9 +153,10 @@ elseif locale == "esES" or locale == "esMX" then
 	FoxDB.L["Visible"]				= "Visible"
 	FoxDB.L["Tooltip"]				= "Información"
 	FoxDB.L["Mouse On"]				= "Ratón encendido"
-	FoxDB.L["Mouse Out"]				= "Ratón fuera"
+	FoxDB.L["Mouse Out"]			= "Ratón fuera"
 	FoxDB.L["Offset"]				= "Compensar"
-	FoxDB.L["Next minimap icon"]		= "Siguiente icono del minimapa"
+	FoxDB.L["Scale"]				= "Escala"
+	FoxDB.L["Next minimap icon"]	= "Siguiente icono del minimapa"
 
 elseif locale == "frFR" then
 	FoxDB.L["Icon is not visible"]	= "L'icône n'est pas visible"
@@ -162,9 +164,10 @@ elseif locale == "frFR" then
 	FoxDB.L["Visible"]				= "Visible"
 	FoxDB.L["Tooltip"]				= "Info-bulle"
 	FoxDB.L["Mouse On"]				= "Souris dessus"
-	FoxDB.L["Mouse Out"]				= "Souris dehors"
+	FoxDB.L["Mouse Out"]			= "Souris dehors"
 	FoxDB.L["Offset"]				= "Offset"
-	FoxDB.L["Next minimap icon"]		= "Prochaine Icône de minimap"
+	FoxDB.L["Scale"]				= "Échelle"
+	FoxDB.L["Next minimap icon"]	= "Prochaine Icône de minimap"
 
 elseif locale == "koKR" then
 	FoxDB.L["Icon is not visible"]	= "아이콘이 보이지 않습니다"
@@ -172,9 +175,10 @@ elseif locale == "koKR" then
 	FoxDB.L["Visible"]				= "보이는"
 	FoxDB.L["Tooltip"]				= "툴팁"
 	FoxDB.L["Mouse On"]				= "마우스 온"
-	FoxDB.L["Mouse Out"]				= "마우스 아웃"
+	FoxDB.L["Mouse Out"]			= "마우스 아웃"
 	FoxDB.L["Offset"]				= "오프셋"
-	FoxDB.L["Next minimap icon"]		= "다음 미니맵 아이콘"
+	FoxDB.L["Scale"]				= "규모"
+	FoxDB.L["Next minimap icon"]	= "다음 미니맵 아이콘"
 
 elseif locale == "ptBR" then
 	FoxDB.L["Icon is not visible"]	= "O ícone não está visível"
@@ -182,9 +186,10 @@ elseif locale == "ptBR" then
 	FoxDB.L["Visible"]				= "Visível"
 	FoxDB.L["Tooltip"]				= "Dica"
 	FoxDB.L["Mouse On"]				= "Mouse entrar"
-	FoxDB.L["Mouse Out"]				= "Mouse sair"
+	FoxDB.L["Mouse Out"]			= "Mouse sair"
 	FoxDB.L["Offset"]				= "Desvio"
-	FoxDB.L["Next minimap icon"]		= "Próximo ícone do minimapa"
+	FoxDB.L["Scale"]				= "Balança"
+	FoxDB.L["Next minimap icon"]	= "Próximo ícone do minimapa"
 
 elseif locale == "ruRU" then
 	FoxDB.L["Icon is not visible"]	= "Значок не виден"
@@ -192,9 +197,10 @@ elseif locale == "ruRU" then
 	FoxDB.L["Visible"]				= "Видимый"
 	FoxDB.L["Tooltip"]				= "Подсказка"
 	FoxDB.L["Mouse On"]				= "Мышь включена"
-	FoxDB.L["Mouse Out"]				= "Мышь выведена"
+	FoxDB.L["Mouse Out"]			= "Мышь выведена"
 	FoxDB.L["Offset"]				= "Компенсировать"
-	FoxDB.L["Next minimap icon"]		= "Следующий значок"
+	FoxDB.L["Scale"]				= "Шкала"
+	FoxDB.L["Next minimap icon"]	= "Следующий значок"
 
 elseif locale == "zhCN" or locale == "zhTW" then
 	FoxDB.L["Icon is not visible"]	= "图标不可见"
@@ -202,9 +208,10 @@ elseif locale == "zhCN" or locale == "zhTW" then
 	FoxDB.L["Visible"]				= "可见的"
 	FoxDB.L["Tooltip"]				= "工具提示"
 	FoxDB.L["Mouse On"]				= "鼠标打开"
-	FoxDB.L["Mouse Out"]				= "鼠标移出"
+	FoxDB.L["Mouse Out"]			= "鼠标移出"
 	FoxDB.L["Offset"]				= "抵消"
-	FoxDB.L["Next minimap icon"]		= "下一个小地图图标"
+	FoxDB.L["Scale"]				= "规模"
+	FoxDB.L["Next minimap icon"]	= "下一个小地图图标"
 
 else
 	FoxDB.L["Icon is not visible"]	= true
@@ -212,9 +219,10 @@ else
 	FoxDB.L["Visible"]				= true
 	FoxDB.L["Tooltip"]				= true
 	FoxDB.L["Mouse On"]				= true
-	FoxDB.L["Mouse Out"]				= true
+	FoxDB.L["Mouse Out"]			= true
 	FoxDB.L["Offset"]				= true
-	FoxDB.L["Next minimap icon"]		= true
+	FoxDB.L["Scale"]				= true
+	FoxDB.L["Next minimap icon"]	= true
 end
 local function L(text) return FoxDB.L[text] == true and text or FoxDB.L[text] end
 
@@ -664,9 +672,10 @@ local function onIconClicked(icon, closeonly)
 		IconManager.MouseOn.Slider:SetValue(icon.Alpha1())
 		IconManager.MouseOut.Slider:SetValue(icon.Alpha2())
 		IconManager.Offset.Slider:SetValue(icon.Offset())
+		IconManager.Scale.Slider:SetValue(icon.Scale())
 
 		IconManager:Show()
-		IconManager:SetSize(383, 239)
+		IconManager:SetSize(383, 262)
 	end
 
 	if maindb then
@@ -1367,7 +1376,7 @@ local function IconManagerInit()
 	if IconManagerInitialized then return else IconManagerInitialized = true end
 	EventRegistry:UnregisterFrameEventAndCallback("PLAYER_LOGIN", IconManager)
 
-	IconManager:SetSize(383, 239)
+	IconManager:SetSize(383, 262)
 	IconManager:SetFrameStrata("DIALOG")
 	IconManager:SetFrameLevel(200)
 	IconManager.heightPadding = 39
@@ -1456,15 +1465,34 @@ local function IconManagerInit()
 	IconManager.Offset.formatters = {}
 	IconManager.Offset.formatters[MinimalSliderWithSteppersMixin.Label.Right] = CreateMinimalSliderFormatter(
 			MinimalSliderWithSteppersMixin.Label.Right,
-			function(value)
-				if value ~= -1 then securecall(CurrentIcon.Offset, value) return value end
+			function(value) if value ~= -1 then
+					securecall(CurrentIcon.Offset, value)
+					return value
+				end
 			end)
 	IconManager.Offset.Slider:Init(-1, -35, 35, 70, IconManager.Offset.formatters)
 	IconManager.Offset:Show()
 
+	IconManager.Scale = IconManager.Scale or CreateFrame("Frame", nil, IconManager, "EditModeSettingSliderTemplate")
+	IconManager.Scale.Slider:SetWidth(190)
+	IconManager.Scale.Slider.MinText:Hide()
+	IconManager.Scale.Slider.MaxText:Hide()
+	IconManager.Scale.Label:SetText(L"Scale")
+	IconManager.Scale:SetPoint("TOPLEFT", IconManager.Offset, "BOTTOMLEFT", 0, 0)
+	IconManager.Scale.formatters = {}
+	IconManager.Scale.formatters[MinimalSliderWithSteppersMixin.Label.Right] = CreateMinimalSliderFormatter(
+			MinimalSliderWithSteppersMixin.Label.Right,
+			function(value) if value ~= -1 then
+					securecall(CurrentIcon.Scale, value)
+					return ("%d%%"):format(value*100)
+				end
+			end)
+	IconManager.Scale.Slider:Init(-1, 0.5, 1.5, 10, IconManager.Scale.formatters)
+	IconManager.Scale:Show()
+
 	IconManager.Divider = IconManager.Divider2 or CreateFrame("Frame", nil, IconManager)
 	IconManager.Divider:SetSize(330,16)
-	IconManager.Divider:SetPoint("TOPLEFT", IconManager.Offset, "BOTTOMLEFT", 0, 3)
+	IconManager.Divider:SetPoint("TOPLEFT", IconManager.Scale, "BOTTOMLEFT", 0, 3)
 	IconManager.Divider.divider = IconManager.Divider:CreateTexture(nil, "ARTWORK")
 	IconManager.Divider.divider:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-OnlineDivider") --389194
 	IconManager.Divider.divider:SetSize(330,16)
