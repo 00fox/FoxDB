@@ -1,9 +1,9 @@
 
---[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓FoxDB 11.1.0-2▓▓
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓©2023-2025 00fox▓▓
 ----------------------------------------------------------------------------------------------------
 --			FoxDB manages the SavedVariables of your addons, with EditMode included.
 ----------------------------------------------------------------------------------------------------
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓©2023-2025 00fox▓▓
+--[[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 	 Written in clean language and optimized code,
 		 the goal of starting from scratch, in addition to EditMode,
@@ -17,7 +17,7 @@
 		 to make a transition from an old one or to keep an old one as it is.
 
 	 Layout management is fully automated, user access is not required,
-		 but some things are still doable.
+		 but some things are doable.
 
 	 You of course still have access to a simplified version of the profiles;
 		 otherwise, this part remains dormant.
@@ -48,10 +48,10 @@
 
 	 EditMode:
 		 Addons that use EditMode receive a simplified common support for the correct functioning of all (addons and system).
-		 Automatic frame registration.
-		 Automatic showing/hidding frames when entering/exiting EditMode.
-		 Automatic hidding system menus and highlighting frames.
-		 Receive a callback when a frame is clicked to hide/show your menu.
+		 Automatic overlays creation and registration.
+		 Automatic showing/hidding overlays when entering/exiting EditMode.
+		 Automatic hidding system menus and highlighting overlays.
+		 Receive a callback when an overlay has been clicked to hide/show your menu.
 
 	 Note:
 		You manually start your addon, then load the Database, which will tell you when the layouts are ready;
@@ -110,8 +110,8 @@ local FunctionsP					= {}
 
 local locale						= GetLocale()
 local nameKey						= UnitName("player")
-local raceKey						= select(2, UnitRace("player"))
-local classKey						= select(2, UnitClass("player"))
+local _,raceKey						= UnitRace("player")
+local _,classKey					= UnitClass("player")
 local factionKey					= UnitFactionGroup("player")
 local realmKey						= GetRealmName()
 local charKey						= UnitName("player").." - "..realmKey
@@ -276,18 +276,18 @@ local firstdatabase = true
 local maindb
 function addon:New(MyAddonDB, useProfiles)
 ----------------------------------------------------------------------------------------------------
-	if not MyAddonDB						then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', is required", 2) end
-	if type(MyAddonDB) ~= "string"			then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', string is required", 2) end
-	if useProfiles and useProfiles ~= true	then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'useProfiles', true is required or leave empty", 2) end
+	if not MyAddonDB						then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', is required", 2) return end
+	if type(MyAddonDB) ~= "string"			then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'MyAddonDB', string is required", 2) return end
+	if useProfiles and useProfiles ~= true	then error("Usage: FoxDB:New(MyAddonDB, useProfiles): 'useProfiles', true is required or leave empty", 2) return end
 
-	-- Database initialization
+	--Database initialization
 	local database = _G[MyAddonDB]
 	if not database then
 		database = {}
 		_G[MyAddonDB] = database
 	end
 
-	-- Transition
+	--Transition
 	if database.profileKeys then
 		if database.profiles then
 			if database.profiles["Default"] then
@@ -307,38 +307,38 @@ function addon:New(MyAddonDB, useProfiles)
 		database.profileKeys = nil
 	end
 
-	-- Generate the 'always' database keys
+	--Generate the 'always' database keys
 							if not database.global		then database.global	= {} end
 							if not database.layouts		then database.layouts	= {} end
 							if not database.profiles	then database.profiles	= {} end
 	if firstdatabase then	if not database.icon		then database.icon		= {} end end
 
-	-- Initializes the meta database
+	--Initializes the meta database
 	local db = setmetatable({}, {__index = database})
 
-	-- Database keys
+	--Database keys
 	local keys = {
-		["global"]		= true,			-- handled in a special case
-		["layouts"]		= true,			-- handled in a special case
-		["profiles"]	= true,			-- handled in a special case
+		["global"]		= true,			--handled in a special case
+		["layouts"]		= true,			--handled in a special case
+		["profiles"]	= true,			--handled in a special case
 		["realm"]		= realmKey,
 		["faction"]		= factionKey,
 		["race"]		= raceKey,
 		["class"]		= classKey,
 		["frealm"]		= frealmKey,
-		["icon"]		= false,		-- container for icon data
---		["layout"]		= false,		-- known only after the launch of EditMode
---		["profile"]		= false,		-- set while New("MyAddonDB") function
+		["icon"]		= false,		--container for icon data
+--		["layout"]		= false,		--known only after the launch of EditMode
+--		["profile"]		= false,		--set while New("MyAddonDB") function
 	}
 
-	-- Add properties
+	--Add properties
 	db.keys				= keys
 	db.keys.main		= firstdatabase
 	db.keys.profiles	= useProfiles
 	db.keys.dbname		= MyAddonDB
 	db.keys.chat		= 0
-	db.keys.locked		= true			-- An operation is in progress concerning the current layout or profile
-	db.keys.editmode	= false			-- Whether EditMode is active or not
+	db.keys.locked		= true			--An operation is in progress concerning the current layout or profile
+	db.keys.editmode	= false			--Whether EditMode is active or not
 
 	db.keys.name		= nameKey
 	db.keys.race		= raceKey
@@ -350,7 +350,7 @@ function addon:New(MyAddonDB, useProfiles)
 
 	db.database			= database
 
-	-- Generate the database keys for each dynamic section
+	--Generate the database keys for each dynamic section
 	for k,v in pairs(keys) do
 		if v ~= false then if not db.database[k] then db.database[k] = {} end end
 		if type(v) ~= "boolean" then
@@ -363,40 +363,35 @@ function addon:New(MyAddonDB, useProfiles)
 		firstdatabase = nil
 		maindb = db
 		db.icon.button = FoxDB.Icon
-		for name, Function in pairs(FunctionsDB) do db[name] = Function end
+		for name,Function in pairs(FunctionsDB) do db[name] = Function end
 	end
 
-	-- locally add layouts functions
-	for name, Function in pairs(FunctionsL) do db[name] = Function end
+	--locally add layouts functions
+	for name,Function in pairs(FunctionsL) do db[name] = Function end
 
-	-- Add profile
+	--Add profile
 	database.profile = nil
 	if useProfiles then
 
-		-- locally add profiles functions
-		for name, Function in pairs(FunctionsP) do db[name] = Function end
+		--locally add profiles functions
+		for name,Function in pairs(FunctionsP) do db[name] = Function end
 
-		-- Generate the profile key
+		--Generate the profile key
 		db.profile = {}
 
-		local newprofile = false
 		if not db.database.profiles[charKey] then
 			db.database.profiles[charKey] = {}
-			newprofile = true
 		end
 
-		-- Attrib the profile
+		--Attrib the profile
 		db.profile = db.database.profiles[charKey]
 
-		-- Change keys.profile name
+		--Change keys.profile name
 		db.keys.profile = charKey
-
-		-- Indicate if the profile was created to launch onNewProfile before onProfileChanged
-		db.keys.newprofile = newprofile
 
 	end
 
-	-- Store in registry
+	--Store in registry
 	FoxDB.Registry[db] = true
 
 	db.keys.locked = false
@@ -415,10 +410,10 @@ end
 -- Register one or several Chat Commands, receive splitted arguments
 function FunctionsDB:RegisterChatCommand(cmd)
 ----------------------------------------------------------------------------------------------------
-	if not cmd									then error("Usage: RegisterChatCommand(cmd): 'cmd', is required", 2) end
-	if type(cmd) ~= "string"					then error("Usage: RegisterChatCommand(cmd): 'cmd', string is required", 2) end
-	if not addon.onChatCommand					then error("Usage: RegisterChatCommand(cmd): you have not defined 'onChatCommand' function in your file", 2) end
-	if type(addon.onChatCommand) ~= "function"	then error("Usage: RegisterChatCommand(cmd): 'onChatCommand' function is required", 2) end
+	if not cmd									then error("Usage: RegisterChatCommand(cmd): 'cmd', is required", 2) return end
+	if type(cmd) ~= "string"					then error("Usage: RegisterChatCommand(cmd): 'cmd', string is required", 2) return end
+	if not addon.onChatCommand					then error("Usage: RegisterChatCommand(cmd): you have not defined 'onChatCommand' function in your file", 2) return end
+	if type(addon.onChatCommand) ~= "function"	then error("Usage: RegisterChatCommand(cmd): 'onChatCommand' function is required", 2) return end
 
 	if self.keys.chat == 0 then
 
@@ -427,10 +422,10 @@ function FunctionsDB:RegisterChatCommand(cmd)
 			msg = msg:gsub("[\r\n]+", "\n")
 			msg = msg:gsub("[\n\n]+", "\n")
 			for i,line in ipairs({split("\n", msg)}) do
-				local _, _, arg1, line = find(line or "", "%s*(%S+)(.*)")
-				local _, _, arg2, line = find(line or "", "%s*(%S+)(.*)")
-				local _, _, arg3, line = find(line or "", "%s*(%S+)(.*)")
-				local _, _, arg4 = find(line or "", "%s*(.*)")
+				local _,_,arg1, line = find(line or "", "%s*(%S+)(.*)")
+				local _,_,arg2, line = find(line or "", "%s*(%S+)(.*)")
+				local _,_,arg3, line = find(line or "", "%s*(%S+)(.*)")
+				local _,_,arg4 = find(line or "", "%s*(.*)")
 				addon.onChatCommand(addon, cmd, arg1 or "", arg2 or "", arg3 or "", arg4 or "")
 			end
 		end
@@ -455,7 +450,7 @@ function FunctionsDB:ResetGlobal()
 ----------------------------------------------------------------------------------------------------
 	self.keys.locked = true
 
-		-- Clear the current global variables
+		--Clear the current global variables
 		for k,v in pairs(self.global) do self.global[k] = nil end
 		if addon.onInitialize then securecall(addon.onInitialize, addon, true) end
 
@@ -496,11 +491,11 @@ end
 -- Deletes a profile, except current.
 function FunctionsP:DeleteProfile(profilename)
 ----------------------------------------------------------------------------------------------------
-	if not profilename or type(profilename) ~= "string"	then error(("DeleteProfile(profilename): 'profilename' - string expected."), 2) end
-	if not self.database.profiles[profilename]			then error(("DeleteProfile error: %q does not exist."):format(profilename), 2) end
+	if not profilename or type(profilename) ~= "string"	then error(("DeleteProfile(profilename): 'profilename' - string expected."), 2) return end
+	if not self.database.profiles[profilename]			then error(("DeleteProfile error: %q does not exist."):format(profilename), 2) return end
 	if profilename == self.keys.profile					then error(("Current profile, Use ResetProfile() instead."), 2) end
 
-	-- Remove the profile
+	--Remove the profile
 	self.database.profiles[profilename] = nil
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
@@ -510,11 +505,10 @@ function FunctionsP:ResetProfile()
 ----------------------------------------------------------------------------------------------------
 	self.keys.locked = true
 
-	-- Clear the current profile
-	for k,v in pairs(self.profile) do
-		self.profile[k] = nil
-	end
-	if self.keys.profiles and addon.onNewProfile then securecall(addon.onNewProfile, addon, self.keys.dbname) end
+		--Clear the current profile
+		for k,v in pairs(self.profile) do
+			self.profile[k] = nil
+		end
 
 	self.keys.locked = false
 	if self.keys.profiles and addon.onProfileChanged then securecall(addon.onProfileChanged, addon, self.keys.dbname) end
@@ -524,17 +518,17 @@ end
 -- Replace current profile by another.
 function FunctionsP:CopyProfile(from)
 ----------------------------------------------------------------------------------------------------
-	if not from or type(from) ~= "string"	then error(("CopyProfile(from): 'from' - string expected."), 2) end
-	if not self.database.profiles[from]		then error(("CopyProfile error: %q does not exist."):format(from), 2) end
+	if not from or type(from) ~= "string"	then error(("CopyProfile(from): 'from' - string expected."), 2) return end
+	if not self.database.profiles[from]		then error(("CopyProfile error: %q does not exist."):format(from), 2) return end
 	if from == self.keys.profile			then return end	--Source and destination are the same
 
 	self.keys.locked = true
 
-	-- Clear the current profile
-	for k,v in pairs(self.profile) do self.profile[k] = nil end
+		--Clear the current profile
+		for k,v in pairs(self.profile) do self.profile[k] = nil end
 
-	-- Copy the profile to current (no link)
-	copyTable(self.database.profiles[from], self.profile)
+		--Copy the profile to current (no link)
+		copyTable(self.database.profiles[from], self.profile)
 
 	self.keys.locked = false
 	if self.keys.profiles and addon.onProfileChanged then securecall(addon.onProfileChanged, addon, self.keys.dbname) end
@@ -573,11 +567,11 @@ end
 -- Deletes a layout, except current.
 function FunctionsL:DeleteLayout(layoutename)
 ----------------------------------------------------------------------------------------------------
-	if not layoutename or type(layoutename) ~= "string"	then error(("DeleteLayout(layoutename): 'layoutename' - string expected."), 2) end
-	if not self.database.layouts[layoutename]			then error(("DeleteLayout error: %q does not exist."):format(layoutename), 2) end
-	if layoutename == self.keys.layout					then error(("Current layout, Use ResetLayout() instead."), 2) end
+	if not layoutename or type(layoutename) ~= "string"	then error(("DeleteLayout(layoutename): 'layoutename' - string expected."), 2) return end
+	if not self.database.layouts[layoutename]			then error(("DeleteLayout error: %q does not exist."):format(layoutename), 2) return end
+	if layoutename == self.keys.layout					then error(("Current layout, Use ResetLayout() instead."), 2) return end
 
-	-- Remove the profile
+	--Remove the profile
 	self.database.layouts[layoutename] = nil
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
@@ -587,9 +581,8 @@ function FunctionsL:ResetLayout()
 ----------------------------------------------------------------------------------------------------
 	self.keys.locked = true
 
-		-- Clear the current layout
+		--Clear the current layout
 		for k,v in pairs(self.layout) do self.layout[k] = nil end
-		if addon.onNewLayout then securecall(addon.onNewLayout, addon, self.keys.dbname) end
 
 	self.keys.locked = false
 	if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, self.keys.dbname) end
@@ -599,16 +592,16 @@ end
 -- Replace current layout by another.
 function FunctionsL:CopyLayout(from)
 ----------------------------------------------------------------------------------------------------
-	if not from or type(from) ~= "string"	then error(("CopyLayout(from): 'from' - string expected."), 2) end
-	if not self.database.layouts[from]		then error(("CopyLayout error: %q does not exist."):format(from), 2) end
+	if not from or type(from) ~= "string"	then error(("CopyLayout(from): 'from' - string expected."), 2) return end
+	if not self.database.layouts[from]		then error(("CopyLayout error: %q does not exist."):format(from), 2) return end
 	if from == self.keys.layout				then return end	--Source and destination are the same
 
 	self.keys.locked = true
 
-		-- Clear the destination layout
+		--Clear the destination layout
 		for k,v in pairs(self.layout) do self.layout[k] = nil end
 
-		-- Copy the layout to current (no link)
+		--Copy the layout to current (no link)
 		copyTable(self.database.layouts[from], self.layout)
 
 	self.keys.locked = false
@@ -621,12 +614,51 @@ end
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
-local Overlays = {}
-local CurrentIcon
+local EditModeSystemSelectionLayout = {
+	["TopRightCorner"]		= {atlas = "%s-NineSlice-Corner",	mirrorLayout = true, x=8, y=8},
+	["TopLeftCorner"]		= {atlas = "%s-NineSlice-Corner",	mirrorLayout = true, x=-8, y=8},
+	["BottomLeftCorner"]	= {atlas = "%s-NineSlice-Corner",	mirrorLayout = true, x=-8, y=-8},
+	["BottomRightCorner"]	= {atlas = "%s-NineSlice-Corner",	mirrorLayout = true, x=8, y=-8},
+	["TopEdge"]				= {atlas = "_%s-NineSlice-EdgeTop"},
+	["BottomEdge"]			= {atlas = "_%s-NineSlice-EdgeBottom"},
+	["LeftEdge"]			= {atlas = "!%s-NineSlice-EdgeLeft"},
+	["RightEdge"]			= {atlas = "!%s-NineSlice-EdgeRight"},
+	["Center"]				= {atlas = "%s-NineSlice-Center", x = -8, y = 8, x1 = 8, y1 = -8,},
+}
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+local function ShowHighlighted(frame)
+----------------------------------------------------------------------------------------------------
+	if frame.textureShown ~= "highlight" then
+		NineSliceUtil.ApplyLayout(frame, EditModeSystemSelectionLayout, frame.highlightTextureKit)
+		frame.textureShown = "highlight"
+	end
+	frame.isSelected = false
+	frame.Label:SetShown(false)
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+local function ShowSelected(frame)
+----------------------------------------------------------------------------------------------------
+	if frame.textureShown ~= "selected" then
+		NineSliceUtil.ApplyLayout(frame, EditModeSystemSelectionLayout, frame.selectedTextureKit)
+		frame.textureShown = "selected"
+	end
+	frame.isSelected = true
 
+	local Label = frame.Label
+	Label:SetFontObject("GameFontHighlightLarge")
+	local Unbounded = Label:GetUnboundedStringWidth() or 1
+	local Wrapped = Label:GetWrappedWidth() or 1
+	if Wrapped < Unbounded then Label:SetFontObject("GameFontHighlightMedium") end
+	local Wrapped = Label:GetWrappedWidth() or 1
+	if Wrapped < Unbounded then Label:SetFontObject("GameFontHighlightSmall") end
+	Label:SetShown(true)
+end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 -- Callback to know if a frame has been clicked while EditMode; all addons, not only System frames.
+-- hooksecurefunc(EditModeManagerFrame, "SelectSystem", onFrameClicked)
 local function onFrameClicked(frame)
 ----------------------------------------------------------------------------------------------------
 	if not InCombatLockdown() then
@@ -634,15 +666,13 @@ local function onFrameClicked(frame)
 
 		for editmodeframe,enabled in pairs(FoxDB.Frames) do
 			if enabled then
-				editmodeframe:SetMovable(false)
-				editmodeframe:ShowHighlighted()		-- Displays in white
+				ShowHighlighted(editmodeframe)		--Displays in white
 			end
 		end
 
 		if FoxDB.Frames[frame] then
 			EditModeManagerFrame:ClearSelectedSystem()
-			frame:ShowSelected(true)				-- Displays in yellow
-			frame:SetMovable(true)
+			ShowSelected(frame)						--Displays in yellow
 		end
 	end
 
@@ -650,10 +680,10 @@ local function onFrameClicked(frame)
 		if addon.onEditModeFrame then securecall(addon.onEditModeFrame, addon, frame, false) end
 	end
 end
---hooksecurefunc(EditModeManagerFrame, 'SelectSystem', onFrameClicked)
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 -- Callback to know if an icon has been clicked while EditMode; all addons, not only our.
+local CurrentIcon
 local function onIconClicked(icon, closeonly)
 ----------------------------------------------------------------------------------------------------
 	CurrentIcon = icon
@@ -661,21 +691,21 @@ local function onIconClicked(icon, closeonly)
 	if not InCombatLockdown() then
 		if IconManager then IconManager:Hide() end
 
-		-- Close the current system menu, if it exists. Taint if InCombat.
+		--Close the current system menu, if it exists. Taint if InCombat.
 		EditModeManagerFrame:ClearSelectedSystem()
 
-		if closeonly then return end
+		if not closeonly then
+			IconManager.Title:SetText(icon.label)
+			IconManager.Tooltip.Button:SetChecked(icon.Tooltip())
+			IconManager.Visibility.Button:SetChecked(icon.Visibility())
+			IconManager.MouseOn.Slider:SetValue(icon.Alpha1())
+			IconManager.MouseOut.Slider:SetValue(icon.Alpha2())
+			IconManager.Offset.Slider:SetValue(icon.Offset())
+			IconManager.Scale.Slider:SetValue(icon.Scale())
 
-		IconManager.Title:SetText(icon.label)
-		IconManager.Tooltip.Button:SetChecked(icon.Tooltip())
-		IconManager.Visibility.Button:SetChecked(icon.Visibility())
-		IconManager.MouseOn.Slider:SetValue(icon.Alpha1())
-		IconManager.MouseOut.Slider:SetValue(icon.Alpha2())
-		IconManager.Offset.Slider:SetValue(icon.Offset())
-		IconManager.Scale.Slider:SetValue(icon.Scale())
-
-		IconManager:Show()
-		IconManager:SetSize(383, 262)
+			IconManager:Show()
+			IconManager:SetSize(383, 262)
+		end
 	end
 
 	if maindb then
@@ -684,10 +714,66 @@ local function onIconClicked(icon, closeonly)
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
+-- Copy of EditModeSystemSelectionBaseMixin
+function FunctionsL:CreateSystemFrame(parent, label, systemname)
+----------------------------------------------------------------------------------------------------
+	if type(parent) ~= "table" then error("CreateSystemFrame(parent, label, systemname) requires an existing parent table object") return end
+
+	parent.Selection = CreateFrame("Frame", nil, parent, "NineSliceCodeTemplate")
+	parent.Selection:SetSize(1,1)
+	parent.Selection:SetFrameStrata("MEDIUM")
+	parent.Selection:SetFrameLevel(1000)
+	parent.Selection:SetToplevel(true)
+	parent.Selection:SetIgnoreParentAlpha(true)
+	parent.Selection:SetClampedToScreen(true)
+	parent.Selection:EnableMouse(true)
+	parent.Selection:RegisterForDrag("LeftButton")
+	parent.Selection:SetMovable(true)
+	parent.Selection:SetDontSavePosition(true)
+	parent.Selection.highlightTextureKit ="editmode-actionbar-highlight"
+	parent.Selection.selectedTextureKit ="editmode-actionbar-selected"
+	parent.Selection.ignoreInLayout = true
+	NineSliceUtil.ApplyLayout(parent.Selection, EditModeSystemSelectionLayout, parent.Selection.highlightTextureKit)
+	parent.Selection.textureShown = "highlight"
+	parent.Selection:SetAllPoints()
+	parent.Selection:Hide()
+
+	parent.Selection.Label = parent.Selection:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+	parent.Selection.Label:SetAllPoints()
+	parent.Selection.Label:SetIgnoreParentScale(true)
+	parent.Selection.Label:SetText(label or "")
+	parent.Selection.Label:Hide()
+
+	parent.Selection:SetScript("OnEnter", function(self)
+			if not self.isSelected then
+				local tooltip = GetAppropriateTooltip()
+				tooltip:SetOwner(self, "ANCHOR_CURSOR")
+				tooltip:SetText(systemname or addonname)
+				tooltip:Show()
+			else
+				local tooltip = GetAppropriateTooltip()
+				tooltip:Hide()
+			end
+		end)
+	parent.Selection:SetScript("OnLeave", function(self)
+			local tooltip = GetAppropriateTooltip()
+			tooltip:Hide()
+		end)
+	parent.Selection:SetScript("OnDragStart", function(self)
+			if parent.OnDragStart then parent:OnDragStart() end
+		end)
+	parent.Selection:SetScript("OnDragStop", function(self)
+			if parent.OnDragStop then parent:OnDragStop() end
+		end)
+
+	return parent.Selection
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
 function FunctionsL:RegisterSystemFrame(frame)
 ----------------------------------------------------------------------------------------------------
 	FoxDB.Frames[frame] = true
-	frame:SetScript('OnMouseDown', onFrameClicked)
+	frame:SetScript("OnMouseDown", onFrameClicked)
 	if EditModeOn then frame:Show() else frame:Hide() end
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
@@ -695,7 +781,7 @@ end
 function FunctionsL:UnregisterSystemFrame(frame)
 ----------------------------------------------------------------------------------------------------
 	FoxDB.Frames[frame] = false
-	frame:SetScript('OnMouseDown', nil)
+	frame:SetScript("OnMouseDown", nil)
 	frame:Hide()
 end
 
@@ -715,6 +801,7 @@ local Snap = EditModeManagerFrame.EnableSnapCheckButton
 
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
+local Overlays = {}
 local firstOverlays = true
 local function onEditModeEnter()
 ----------------------------------------------------------------------------------------------------
@@ -723,25 +810,23 @@ local function onEditModeEnter()
 	if not InCombatLockdown() then
 
 		if firstOverlays then
-		firstOverlays = false
+			firstOverlays = nil
 
 			local frame = EnumerateFrames()
 			while frame do
-				if frame.selectedTextureKit == "editmode-actionbar-selected" then
+				if frame.selectedTextureKit and frame.selectedTextureKit == "editmode-actionbar-selected" then
 					if not Overlays[frame] then
 						Overlays[frame] = true
 						if not FoxDB.Frames[frame] then
-							frame:HookScript('OnMouseDown', function(self) onFrameClicked(self) end)
+							frame:HookScript("OnMouseDown", function(self) onFrameClicked(self) end)
 						end
 					end
-				else
-					if not Overlays[frame] then
-						local name = frame:GetDebugName()
-						if name:match("FoxDB_Icon_") then
-							Overlays[frame] = true
-							if name ~= "FoxDB_Icon_"..addonname then
-								frame:HookScript('OnClick', function(self, btn) if EditModeOn then securecall(onIconClicked, self, true) end end)
-							end
+				elseif not Overlays[frame] then
+					local name = frame:GetDebugName()
+					if find(name, "FoxDB_Icon_") then
+						Overlays[frame] = true
+						if name ~= "FoxDB_Icon_"..addonname then
+							frame:HookScript("OnClick", function(self, btn) if EditModeOn then securecall(onIconClicked, self, true) end end)
 						end
 					end
 				end
@@ -752,7 +837,8 @@ local function onEditModeEnter()
 		for editmodeframe,enabled in pairs(FoxDB.Frames) do
 			if enabled then
 				securecall(editmodeframe.Show, editmodeframe)
-				securecall(editmodeframe.ShowHighlighted, editmodeframe)		-- Displays in white
+--				securecall(editmodeframe.ShowHighlighted, editmodeframe)		--Displays in white
+				ShowHighlighted(editmodeframe)
 			end
 		end
 
@@ -838,32 +924,32 @@ local function onLayoutSaved()
 	local LayoutIndex = GetLayouts.activeLayout
 	local LayoutNumber = #Layouts + 2
 
-	if LayoutNumber == FoxDBLayoutNumber then		-- Filter other events of onLayoutUpdated()
+	if LayoutNumber == FoxDBLayoutNumber then		--Filter other events of onLayoutUpdated()
 		local index = nil
-		for i = 1, LayoutNumber - 2 do
+		for i=1,LayoutNumber-2 do
 			if Layouts[i].layoutName ~= FoxDBLayouts[i].layoutName then index = i end
 		end
 		if index then
 			local oldname = FoxDBLayouts[index].layoutName
 			local newname = Layouts[index].layoutName
-			if index == FoxDBLayoutIndex - 2 then	-- If Current layout
+			if index == FoxDBLayoutIndex - 2 then	--If Current layout
 				for db in pairs(FoxDB.Registry) do
 					db.keys.locked = true
 
-						-- Remove the new layout if exists
+						--Remove the new layout if exists
 						db.database.layouts[newname] = nil
 
-						-- Copy the current layout to new destination
+						--Copy the current layout to new destination
 						rawset(db.database.layouts, newname, db.database.layouts[oldname])
 
-						-- Remove the old layout
+						--Remove the old layout
 						db.layout = nil
 						db.database.layouts[oldname] = nil
 
-						-- Reattrib the layout
+						--Reattrib the layout
 						db.layout = db.database.layouts[newname]
 
-						-- Change keys.layout name
+						--Change keys.layout name
 						db.keys.layout = newname
 
 					db.keys.locked = false
@@ -871,13 +957,13 @@ local function onLayoutSaved()
 				FoxDBLayoutName = newname
 			else
 				for db in pairs(FoxDB.Registry) do
-					-- Remove the new layout if exists
+					--Remove the new layout if exists
 					db.database.layouts[newname] = nil
 
-					-- Copy the old named layout to new destination
+					--Copy the old named layout to new destination
 					rawset(db.database.layouts, newname, db.database.layouts[oldname])
 
-					-- Remove the old layout
+					--Remove the old layout
 					db.database.layouts[oldname] = nil
 				end
 			end
@@ -903,83 +989,77 @@ local function onLayoutUpdated()
 	if LayoutIndex > 2 then LayoutName = Layouts[LayoutIndex - 2].layoutName elseif LayoutIndex == 2 then LayoutName = "Preset_Classic" else LayoutName = "Preset_Modern" end
 	local LayoutNumber = #Layouts + 2
 
-	if FoxDBLayoutName == nil then					-- Loading the layout while edit mode initialization
+	if FoxDBLayoutName == nil then					--Loading the layout while edit mode initialization
 		if LayoutName then
 			for db in pairs(FoxDB.Registry) do
-				local created = false
 				db.keys.locked = true
 
-					-- Do the new layout already exist?
+					--Do the new layout already exist?
 					if not db.database.layouts[LayoutName] then
 						db.database.layouts[LayoutName] = {}
-						created = true
 					end
 
-					-- Attrib the layout
+					--Attrib the layout
 					db.layout = nil
 					db.layout = {}
 					db.layout = db.database.layouts[LayoutName]
 
-					-- Change keys.layout name
+					--Change keys.layout name
 					db.keys.layout = LayoutName
-					if created then if addon.onNewLayout then securecall(addon.onNewLayout, addon, db.keys.dbname) end end
 
 				db.keys.locked = false
 
-				if db.keys.newprofile then
-					if db.onNewProfile and db.keys.profiles and addon.onNewProfile then securecall(addon.onNewProfile, addon, db.keys.dbname) end
-					db.keys.newprofile = false
-				end
 				if db.keys.profiles and	addon.onProfileChanged	then securecall(addon.onProfileChanged, addon, db.keys.dbname)	end
 				if						addon.onLayoutLoaded	then securecall(addon.onLayoutLoaded, addon, db.keys.dbname)	end
 			end
 			FoxDBLayoutName = LayoutName
 		end
-	elseif LayoutNumber > FoxDBLayoutNumber then	-- Adding a layout swap automatically to it
+	elseif LayoutNumber > FoxDBLayoutNumber then	--Adding a layout swap automatically to it
 		for db in pairs(FoxDB.Registry) do
 			db.keys.locked = true
-				-- Remove the current layout
+
+				--Remove the current layout
 				db.layout = nil
 
-				-- overwrite but not delete if already exists in an old SavedVariables copied before
+				--overwrite but not delete if already exists in an old SavedVariables copied before
 				if not db.database.layouts[LayoutName] then db.database.layouts[LayoutName] = {} end
 
-				-- Copy the layout to destination (no link)
+				--Copy the layout to destination (no link)
 				copyTable(db.database.layouts[FoxDBLayoutName], db.database.layouts[LayoutName])
 
-				-- Attrib the layout
+				--Attrib the layout
 				db.layout = db.database.layouts[LayoutName]
 
-				-- Change keys.layout name
+				--Change keys.layout name
 				db.keys.layout = LayoutName
 
 			db.keys.locked = false
 			if addon.onLayoutChanged then securecall(addon.onLayoutChanged, addon, db.keys.dbname) end
 		end
-	elseif LayoutNumber < FoxDBLayoutNumber then	-- Romoving a layout swap automatically to a preset if we were on that layout, else we stay on actual layout
-		if LayoutNumber == 2 then					-- If the layout was the last non preset layout
+	elseif LayoutNumber < FoxDBLayoutNumber then	--Romoving a layout swap automatically to a preset if we were on that layout, else we stay on actual layout
+		if LayoutNumber == 2 then					--If the layout was the last non preset layout
 			for db in pairs(FoxDB.Registry) do
 				db.keys.locked = true
 
-					-- Remove the current layout
+					--Remove the current layout
 					db.layout = nil
 
-					-- Do the new layout already exist?
+					--Do the new layout already exist?
 					if not db.database.layouts[LayoutName] then
-						-- Create new empty layout
+						--Create new empty layout
 						db.database.layouts[LayoutName] = {}
 
-						-- Copy the layout to destination (no link)
+						--Copy the layout to destination (no link)
 						copyTable(db.database.layouts[FoxDBLayouts[1].layoutName], db.database.layouts[LayoutName])
 					end
 
-					-- Remove the deleted layout
+					--Remove the deleted layout
 					db.database.layouts[FoxDBLayouts[1].layoutName] = nil
 
-					-- Attrib the layout
+					--Attrib the layout
 					db.layout = db.database.layouts[LayoutName]
 
-					-- Change keys.layout name
+					--Change keys.layout name
 					db.keys.layout = LayoutName
 
 				db.keys.locked = false
@@ -988,7 +1068,7 @@ local function onLayoutUpdated()
 		else	
 			local nameold = nil
 			local Layoutfound = false
-			for index = 3, LayoutNumber do			-- Else if not latest non preset layout
+			for index=3,LayoutNumber do			--Else if not latest non preset layout
 				if not Layoutfound then
 					nameold = FoxDBLayouts[index - 2].layoutName
 					local namenew = Layouts[index - 2].layoutName
@@ -998,31 +1078,31 @@ local function onLayoutUpdated()
 					end
 				end
 			end
-			if not Layoutfound then					-- Else if the latest non preset layout
+			if not Layoutfound then					--Else if the latest non preset layout
 				nameold = FoxDBLayouts[FoxDBLayoutNumber - 2].layoutName
 			end
 			for db in pairs(FoxDB.Registry) do
 				db.keys.locked = true
 
-					-- Remove the current layout
+					--Remove the current layout
 					db.layout = nil
 
-					-- Do the new layout already exist?
+					--Do the new layout already exist?
 					if not db.database.layouts[LayoutName] then
-						-- Create new empty layout
+						--Create new empty layout
 						db.database.layouts[LayoutName] = {}
 
-						-- Copy the layout to destination (no link)
+						--Copy the layout to destination (no link)
 						copyTable(db.database.layouts[FoxDBLayoutName], db.database.layouts[LayoutName])
 					end
 
-					-- Remove the deleted layout
+					--Remove the deleted layout
 					db.database.layouts[nameold] = nil
 
-					-- Attrib the layout
+					--Attrib the layout
 					db.layout = db.database.layouts[LayoutName]
 
-					-- Change keys.layout name
+					--Change keys.layout name
 					db.keys.layout = LayoutName
 
 				db.keys.locked = false
@@ -1033,22 +1113,22 @@ local function onLayoutUpdated()
 		for db in pairs(FoxDB.Registry) do
 			db.keys.locked = true
 
-				-- Remove the current layout
+				--Remove the current layout
 				db.layout = nil
 
-				-- Do the new layout already exist?
+				--Do the new layout already exist?
 				if not db.database.layouts[LayoutName] then
-					-- Create new empty layout
+					--Create new empty layout
 					db.database.layouts[LayoutName] = {}
 
-					-- Copy the layout to destination (no link)
+					--Copy the layout to destination (no link)
 					copyTable(db.database.layouts[FoxDBLayoutName], db.database.layouts[LayoutName])
 				end
 
-				-- Attrib the layout
+				--Attrib the layout
 				db.layout = db.database.layouts[LayoutName]
 
-				-- Change keys.layout name
+				--Change keys.layout name
 				db.keys.layout = LayoutName
 
 			db.keys.locked = false
@@ -1092,7 +1172,7 @@ local function GetAllIcons()
 	local frame = EnumerateFrames()
 	while frame do
 		local name = frame:GetDebugName()
-		if name:match("FoxDB_Icon_") then
+		if find(name, "FoxDB_Icon_") then
 			insert(FoxDB.Icons, frame)
 		end
 		frame = EnumerateFrames(frame)
@@ -1150,10 +1230,10 @@ function FunctionsDB:IconStart()
 	local icon = self.icon
 	icon.label = icon.label or addonname
 
-	-- Errors
-	if not icon.file then error("Can't start icon without icon object, use self.db.icon.file =") end
+	--Errors
+	if not icon.file then error("Can't start icon without icon object, use self.db.icon.file =") return end
 
-	-- Variables
+	--Variables
 	if type(icon.tooltip)	~= "boolean"	then icon.tooltip	= true					end
 	if type(icon.visible)	~= "boolean"	then icon.visible	= true					end
 	if type(icon.alpha1)	~= "number"		then icon.alpha1	= 0.8					end
@@ -1166,7 +1246,7 @@ function FunctionsDB:IconStart()
 	if type(icon.line2)		~= "string"		then icon.line2		= ""					end
 	if type(icon.line3)		~= "string"		then icon.line3		= ""					end
 
-	-- Button
+	--Button
 	local button = FoxDB.Icon or CreateFrame("Button", IconName, UIParent)
 	button.label = icon.label
 	button:SetSize(30, 30)
@@ -1174,36 +1254,36 @@ function FunctionsDB:IconStart()
 	button:SetFixedFrameStrata(false)
 	button:SetFrameLevel(1002)
 	button:SetFixedFrameLevel(true)
-	-- Icon
+	--Icon
 	button.texture = button.icon or button:CreateTexture(IconName.."_icon", "BACKGROUND")
 	button.texture:SetSize(25, 25)
 	button.texture:SetPoint("CENTER", 0.34, 0)
 	button.texture:SetTexture(icon.file)
 	button.texture:SetMask("Interface\\Masks\\CircleMaskScalable")
-	-- Normal
+	--Normal
 	button.normal = button.normal or button:CreateTexture(IconName.."_normal", "BORDER")
 	button.normal:SetSize(30, 30)
 	button.normal:SetAlpha(0.65)
 	button.normal:SetPoint("CENTER")
 	button.normal:SetTexture("Interface\\COMMON\\GoldRing")
-	-- highlight
+	--highlight
 	button.highlight = button.highlight or button:CreateTexture(IconName.."_highlight", "HIGHLIGHT")
 	button.highlight:SetSize(24.467, 24.367)
 	button.highlight:SetAlpha(0.75)
 	button.highlight:SetPoint("CENTER",1.43,-1.01)
 	button.highlight:SetTexture("Interface\\COMMON\\CommonRoundHighlight")
 
-	-- Tooltip
+	--Tooltip
 	button.Tooltip = function(tooltip) if type(tooltip) ~= "boolean" then return icon.tooltip else icon.tooltip = tooltip end end
 	button.onIconEnter = function(btn)
 		if not btn then return end
 		btn:SetAlpha(icon.alpha1)
-		if GameTooltip and (icon.tooltip or EditModeOn) then
+		if not GameTooltip:IsForbidden() and (icon.tooltip or EditModeOn) then
 			GameTooltip:ClearLines()
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:AddLine(icon.label, 0, 1, 0)
 			if EditModeOn then
-				GameTooltip:AddDoubleLine("|cff69ccf0Scale:|r",	("|cffffffff%s|r"):format(icon.scale))
+				GameTooltip:AddDoubleLine("|cFF69CCF0Scale:|r",	("|cFFFFFFFF%s|r"):format(icon.scale))
 				if icon.visible == false then
 					GameTooltip:AddLine(L"Icon is not visible", 1, 1, 1)
 				end
@@ -1213,9 +1293,9 @@ function FunctionsDB:IconStart()
 				local line2 = type(icon.line2) == "string" and icon.line2 ~= ""
 				local line3 = type(icon.line3) == "string" and icon.line3 ~= ""
 				if not (line1 or line2 or line3) then return end
-				if line1 then GameTooltip:AddDoubleLine("|cff69ccf0Left:|r", 	("|cffffffff%s|r"):format(icon.line1)) end
-				if line2 then GameTooltip:AddDoubleLine("|cff69ccf0Middle:|r",	("|cffffffff%s|r"):format(icon.line2)) end
-				if line3 then GameTooltip:AddDoubleLine("|cff69ccf0Right:|r",	("|cffffffff%s|r"):format(icon.line3)) end
+				if line1 then GameTooltip:AddDoubleLine("|cFF69CCF0Left:|r", 	("|cFFFFFFFF%s|r"):format(icon.line1)) end
+				if line2 then GameTooltip:AddDoubleLine("|cFF69CCF0Middle:|r",	("|cFFFFFFFF%s|r"):format(icon.line2)) end
+				if line3 then GameTooltip:AddDoubleLine("|cFF69CCF0Right:|r",	("|cFFFFFFFF%s|r"):format(icon.line3)) end
 			else
 				GameTooltip:AddLine(L"Tooltip deactivated", 1, 1, 1)
 			end
@@ -1225,12 +1305,12 @@ function FunctionsDB:IconStart()
 	button.onIconLeave = function(btn)
 		if not btn then return end
 		btn:SetAlpha(icon.alpha2)
-		if (icon.tooltip or EditModeOn == true) and GameTooltip then if GameTooltip then GameTooltip:Hide() end end
+		if (icon.tooltip or EditModeOn == true) and GameTooltip then if not GameTooltip:IsForbidden() and GameTooltip:IsShown() then GameTooltip:Hide() end end
 	end
 	button:SetScript("OnEnter", function(btn) securecall(button.onIconEnter, btn) end)
 	button:SetScript("OnLeave", function(btn) securecall(button.onIconLeave, btn) end)
 
-	-- Visibility
+	--Visibility
 	button.Visibility = function(visible)
 			if visible ~= "_" then if type(visible) ~= "boolean" then return icon.visible else icon.visible = visible end end
 			if addon.onIconVisibility then securecall(addon.onIconVisibility, addon, icon.visible) end
@@ -1243,7 +1323,7 @@ function FunctionsDB:IconStart()
 			end
 		end
 
-	-- Transparency
+	--Transparency
 	button.Alpha1 = function(alpha1)
 			if alpha1 ~= "_" then if type(alpha1) ~= "number" then return icon.alpha1 else icon.alpha1 = min(max(alpha1, 0.2), 1) end end
 			icon.alpha2 = min(max(icon.alpha2, 0), icon.alpha1)
@@ -1255,7 +1335,7 @@ function FunctionsDB:IconStart()
 			button:SetAlpha(icon.alpha2)
 		end
 
-	-- Scale
+	--Scale
 	button.Scale = function(scale)
 			if scale ~= "_" then if type(scale) ~= "number" then return icon.scale else icon.scale = min(max(scale, 0.8), 3) end end
 			button:ClearAllPoints()
@@ -1263,7 +1343,7 @@ function FunctionsDB:IconStart()
 			securecall(button.Minimap)
 		end
 
-	-- Position
+	--Position
 	button:SetDontSavePosition(true)
 	button:SetClampedToScreen(true)
 	button:SetMovable(true)
@@ -1298,17 +1378,17 @@ function FunctionsDB:IconStart()
 			securecall(button.Minimap)
 		end
 	button.onReceiveDrag = function(btn)
-		local x, y = GetCursorPosition()
+		local x,y = GetCursorPosition()
 		if Minimap then
 			local scale = Minimap:GetEffectiveScale()
-			local z, t = Minimap:GetCenter()
-			z, t = z*scale, t*scale
+			local z,t = Minimap:GetCenter()
+			z,t = z*scale, t*scale
 			icon.angle = atan2(y-t, x-z)
 			securecall(button.Minimap)
 		end
 	end
 	button.onDragStart = function(btn)
-			if icon.tooltip then if GameTooltip then GameTooltip:Hide() end end
+			if icon.tooltip then if not GameTooltip:IsForbidden() and GameTooltip:IsShown() then GameTooltip:Hide() end end
 			if EditModeOn then securecall(onIconClicked, button, true) end
 			button:SetScript("OnUpdate", function(self) if self.onReceiveDrag then securecall(self.onReceiveDrag, button) end end)
 			button:StartMoving()
@@ -1328,7 +1408,7 @@ function FunctionsDB:IconStart()
 	EventRegistry:RegisterCallback("EditMode.Enter", button.onEditModeEnter, button)
 	EventRegistry:RegisterCallback("EditMode.Exit", button.onEditModeExit, button)
 
-	-- Mouse
+	--Mouse
 	button:RegisterForClicks("anyUp")
 	button:SetScript("OnClick", function(self, btn)
 			if EditModeOn														then securecall(onIconClicked, button)
@@ -1344,7 +1424,7 @@ function FunctionsDB:IconStart()
 			securecall(button.onIconEnter, button)
 		end
 
-	-- Initialization
+	--Initialization
 	button.onInit = function()
 			EventRegistry:UnregisterFrameEventAndCallback("PLAYER_LOGIN", button)
 			securecall(button.Visibility, "_")
@@ -1399,8 +1479,8 @@ local function IconManagerInit()
 	IconManager.Close.ignoreInLayout = true
 	IconManager.Close:Show()
 
-	IconManager.Title = IconManager.Title or IconManager:CreateFontString(nil, nil, 'GameFontHighlightLarge')
-	IconManager.Title:SetPoint('TOP', 0, -15)
+	IconManager.Title = IconManager.Title or IconManager:CreateFontString(nil, nil, "GameFontHighlightLarge")
+	IconManager.Title:SetPoint("TOP", 0, -15)
 	IconManager.Title:Show()
 
 	IconManager.Visibility = IconManager.Visibility or CreateFrame("Frame", nil, IconManager, "EditModeSettingCheckboxTemplate")
@@ -1502,7 +1582,7 @@ local function IconManagerInit()
 	IconManager.Next = IconManager.Next or CreateFrame("Button", nil, IconManager, "EditModeSystemSettingsDialogButtonTemplate")
 	IconManager.Next:SetWidth(330)
 	IconManager.Next:SetText(L"Next minimap icon")
-	IconManager.Next:SetPoint("TOPLEFT", IconManager.Divider, "BOTTOMLEFT", -1, -2)	-- 0, -12 after divider if CheckBox
+	IconManager.Next:SetPoint("TOPLEFT", IconManager.Divider, "BOTTOMLEFT", -1, -2)	--0, -12 after divider if CheckBox
 	IconManager.Next:SetOnClickHandler(function() securecallfunction(FunctionsDB.GetNextIcon, FoxDB) end)
 	IconManager.Next:Show()
 end

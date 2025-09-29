@@ -1,18 +1,30 @@
-## Interface: 110100
+## Interface: 110200
 ## Title: |cff1784d1FoxDBTest|r
+## X-Category: Library
+
+## Category: Libraries
+## Category-deDE: Bibliotheken
+## Category-esES: Bibliotecas
+## Category-esMX: Bibliotecas
+## Category-frFR: Bibliothèques
+## Category-itIT: Librerie
+## Category-koKR:
+## Category-ptBR: Bibliotecas
+## Category-ruRU: Библиотеки
+## Category-zhCN: 函数库
+## Category-zhTW: 函式庫
+
+## Group: FoxDBTest
 ## Notes: FoxDB manages the SavedVariables of your addons, with EditMode included
+## Version: Release-11.2.0-0
+
 ## Author: 00fox
 ## X-Email: mail@00fox.com
 ## X-Website: https://github.com/00fox/FoxDB
 ## X-Feedback: issues@00fox.com
-## X-Category: Library
 ## X-License: Artistic License 2.0
 ## X-Credits: 
 ## X-Curse-Project-ID: 1092056
-## Version: Release-11.1.0-0
-
-## X-WoWI-ID: 
-## X-Wago-ID: 
 
 ## DefaultState: enabled
 ## LoadOnDemand: 0

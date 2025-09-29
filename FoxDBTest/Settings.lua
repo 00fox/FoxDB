@@ -50,10 +50,10 @@ StaticPopupDialogs["FoxDBTest_WEB_ADDRESS"] = {
 	enterClicksFirstButton = true,
 	preferredIndex = 3,
 	OnShow = function (self, data)
-			self.editBox:SetText(StaticPopupDialogsText)
-			self.editBox:SetJustifyH("CENTER")
-			self.editBox:SetWidth(240)
-			self.editBox:HighlightText()
+			StaticPopup1EditBox:SetText("https://github.com/00fox/FoxDB")
+			StaticPopup1EditBox:SetJustifyH("CENTER")
+			StaticPopup1EditBox:SetWidth(240)
+			StaticPopup1EditBox:HighlightText()
 		end
 }
 
@@ -449,10 +449,7 @@ function Settings:InitBase()
 	self.github:SetText("Github")
 	self.github.tooltipText = "|cFFFFFF00Github of 00fox/FoxDB|r\n\n "..L[9.105]
 	self.github:RegisterForClicks("AnyUp")
-	self.github:SetScript("OnClick", function()
-			StaticPopupDialogsText = "https://github.com/00fox/FoxDB"
-			StaticPopup_Show("FoxDBTest_WEB_ADDRESS")
-		end)
+	self.github:SetScript("OnClick", function() StaticPopup_Show("FoxDBTest_WEB_ADDRESS") end)
 
 	self.reset = function() After(0.01, function()
 			self.Check1:SetChecked(Global.TestActivated)
@@ -1056,22 +1053,6 @@ YYYfunction MyAddon:onInitialize(reset)YY\n\
          using a reset of global variables.\n\
 YYYendYY\n"))
 
-	local page, title, width = self:AddPage("onNewProfile()", nil)
-	local text = page:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
-	text:SetWidth(width)
-	text:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 5, -15)
-	text:SetJustifyH("LEFT")
-	page:SetHeight(600)
-	text:SetText(self:ToYellow("Function called by GGGFoxDBYY when a BBBprofileYY didn't exist\r\
-    (optional: don't put if not used to not register it)\n\n\
-YYYfunction MyAddon:onNewProfile()YY\n\
-    There is no need to a default profile anymore.\r\
-    Then do veryfirsttime stuff there, time stamps etc.\r\
-    but better do variables management in onProfileChanged.\n\
-YYYendYY\n\n\
-Note: YYYonProfileChanged()YY will be called afterwards,\r\
-    don't call it by yourself.\n"))
-
 	local page, title, width = self:AddPage("onProfileChanged()", nil)
 	local text = page:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
 	text:SetWidth(width)
@@ -1080,9 +1061,7 @@ Note: YYYonProfileChanged()YY will be called afterwards,\r\
 	page:SetHeight(600)
 	text:SetText(self:ToYellow("Function called by GGGFoxDBYY when a BBBprofileYY has been changed\r\
     (optional: don't put if not used to not register it)\n\n\
-YYYfunction MyAddon:onProfileChanged()YY\n\
-    If the profile did not already exist,\r\
-    YYYonNewProfile()YY (if used) was called before this.\n\n\
+YYYfunction MyAddon:onProfileChanged()YY\n\n\
     You may want to reset, erase some old datas\r\
     from previous versions, or specific while change is made:\n\
     YYYself.db.profile.myVariable = true\r\
@@ -1126,27 +1105,6 @@ YYYfunction MyAddon:onLayoutLoaded()YY\n\
          YYYself.db.keys.layoutYY   Name of the current layout\n\
 YYYendYY\n"))
 
-	local page, title, width = self:AddPage("onNewLayout()", nil)
-	local text = page:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
-	text:SetWidth(width)
-	text:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 5, -15)
-	text:SetJustifyH("LEFT")
-	page:SetHeight(600)
-	text:SetText(self:ToYellow("Function called by GGGFoxDBYY when a BBBlayoutYY didn't exist\r\
-    (optional: don't put if not used to not register it)\n\n\
-YYYfunction MyAddon:onNewLayout()YY\n\
-    Technically this will only happen on load\r\
-         if the layout doesn't exist,\r\
-         or when the layout is reset by the function made for this.\r\
-         Because, when creating (or moving to) a new layout,\r\
-         the new layout is copied from the current one\r\
-         or from the source of the copy.\n\n\
-    Then do veryfirsttime stuff there, time stamps etc.\r\
-    but better do variables management in onLayoutChanged.\n\
-YYYendYY\n\n\
-Note: YYYonLayoutChanged()YY will be called afterwards,\r\
-    don't call it by yourself.\n"))
-
 	local page, title, width = self:AddPage("onLayoutChanged()", nil)
 	local text = page:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
 	text:SetWidth(width)
@@ -1156,8 +1114,7 @@ Note: YYYonLayoutChanged()YY will be called afterwards,\r\
 	text:SetText(self:ToYellow("Function called by GGGFoxDBYY when a BBBlayoutYY has been changed\n\n\
 YYYfunction MyAddon:onLayoutChanged()YY\n\
     If the layout did not already exist,\r\
-    it was copied from the current layout,\r\
-    otherwise, YYYonNewLayout()YY (if used) was called before this.\n\n\
+    it was copied from the current layout.\n\n\
     You may want to reset, erase some old datas\r\
     from previous versions, or specific while change is made:\n\
     YYYself.db.layout.myVariable = true\r\
@@ -1257,7 +1214,7 @@ endYY"))
 will call YYYonInitialize(true)YY then YYYonLayoutChanged()YY\r\
     YYYself.db:ResetGlobal()YY\n\n\n\
 Clear the current BBBprofileYY,\r\
-will call YYYonNewProfile()YY then YYYonProfileChanged()YY\r\
+will call YYYonProfileChanged()YY\r\
     YYYself.db:ResetProfile()YY\n\n\
 Returns a table with the names of existing profiles,\r\
 Current one is not in if 'nocurrent' is specified,\r\
@@ -1269,7 +1226,7 @@ Replace current profile by another,\r\
 'YYYfromYY' is a string with profile name.\r\
     YYYself.db:CopyProfile(from)YY\n\n\n\
 Clear the current BBBlayoutYY,\r\
-will call YYYonNewLayout()YY then YYYonLayoutChanged()YY\r\
+will call YYYonLayoutChanged()YY\r\
     YYYself.db:ResetLayout()YY\n\n\
 Returns a table with the names of existing layouts,\r\
 Current one is not in if 'nocurrent' is specified,\r\
@@ -1450,22 +1407,27 @@ GGGMinimapYY behavior:\r\
 	text:SetWidth(width)
 	text:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 5, -15)
 	text:SetJustifyH("LEFT")
-	page:SetHeight(1050)
+	page:SetHeight(1170)
 	text:SetText(self:ToYellow("In order to manage a frame into EditMode you need an BBBoverlayYY.\n\n\
-You have to do this part yourself:\r\
-    YYYlocal MyFrame\r\
-    local overlay = CreateFrame(\"Frame\", nil, MyFrame, \"EditModeSystemSelectionTemplate\")YY\r\
-    (Set the overlay's parent to your frame, not UIParent,\r\
-    otherwise you'll get errors while moving system frames.)\n\n\
-Manage it's position, drag etc:\n\
-    YYYoverlay:SetScript('OnDragStart', ...)\r\
-    overlay:SetScript('OnDragStop', ...)YY\n\n\
-    Set all points of BBBoverlayYY to the frame.\r\
-    When you start to drag the overlay, hide your menu,\r\
-    clear all points, then make the frame follow the overlay.\r\
-    When you stop to drag the overlay, save the position,\r\
-    and set all points of overlay to the frame again;\r\
-    possibly show your menu again.\r\
+FoxDB can create and manage it for you:\r\
+    YYYlocal frame = CreateFrame(\"Frame\", nil, UIParent)\r\
+    local overlay = self.db:CreateSystemFrame(frame, \"Label\", \"System Name\")YY\n\n\
+    YYYLabelYY is shown on the overlay when the player click on it,\r\
+    YYYSystem NameYY is the group of the overlay,\r\
+    and will be shown as tooltip if not yet selected;\r\
+    if empty, it will be set to your addon name.\n\n\
+You have to manage your frame position in those functions:\r\
+    YYYframe.OnDragStart = function()...end\r\
+    frame.OnDragStop = function()...endYY\n\n\
+    When you start to drag the BBBoverlayYY:\r\
+    hide your menu,\r\
+    clear all points,\r\
+    then make the frame movable and start moving.\n\n\
+    When you stop to drag:\r\
+    stop from moving, make the frame not movable\r\
+    then save the position;\r\
+    possibly show your menu again.\n\n\
+    In any case, the overlay will follow the frame.\r\
     GGGA complete exemple is in FoxDBTestYY.\n\n\
 And register it with FoxDB library\r\
     YYYself.db:RegisterSystemFrame(overlay)YY\n\n\
@@ -1545,8 +1507,7 @@ In YYYMyAddon:onLayoutLoaded()YY\r\
 In YYYMyAddon:onProfileChanged()YY (see GGGonProfileChanged()YY)\r\
     Put everything you need after a new profile, reset or copy.\r\
     There is no more the concept of BBBDefaultYY profile and variables,\r\
-    so you just need to check if a player posses old default there.\r\
-    No need to use MyAddon:onNewProfile() now.\n\n\
+    so you just need to check if a player posses old default there.\n\n\
 ----- Try your addon at this step, it should work as before -----\n\n\
     In your database, first time,\r\
     A BBBtransitionYY has been done to adapt everything like frealm,\r\

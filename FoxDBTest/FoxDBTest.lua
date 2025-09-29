@@ -143,7 +143,33 @@ EventHandler:RegisterEvent("LUA_WARNING")
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---										INITIALIZE
+--										MOTOR
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+function FoxDBTest:Launch(reverse)
+----------------------------------------------------------------------------------------------------
+	if reverse then Global.TestActivated = not Global.TestActivated end
+
+	if Global.TestActivated then
+		if not self.Launched then
+			self.Launched = true
+			self:CreateFrames()
+			self:DialogInit()
+		end
+		self:SetFrames()
+	elseif self.Launched then
+		self.GlobalFrame:Hide()
+		self.LayoutFrame:Hide()
+		self.ProfilFrame:Hide()
+	end
+end
+
+
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--										GLOBAL
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
@@ -183,71 +209,10 @@ end
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---										MOTOR
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FoxDBTest:Launch(reverse)
-----------------------------------------------------------------------------------------------------
-	if reverse then Global.TestActivated = not Global.TestActivated end
-
-	if Global.TestActivated then
-		if not self.Launched then
-			self.Launched = true
-			self:CreateFrames()
-			self:DialogInit()
-		end
-		self:SetFrames()
-	elseif self.Launched then
-		self.GlobalFrame:Hide()
-		self.LayoutFrame:Hide()
-		self.ProfilFrame:Hide()
-	end
-end
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
---										ICON
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-
-
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FoxDBTest:onIconLeftClick()
-----------------------------------------------------------------------------------------------------
-	if Settings.Category then OpenToCategory(Settings.Category)	end
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FoxDBTest:onIconRightClick()
-----------------------------------------------------------------------------------------------------
-	ReloadUI()
-end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
---function FoxDBTest:onIconMiddleClick()
-----------------------------------------------------------------------------------------------------
---end
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
---function FoxDBTest:onIconVisibility(visible)
-----------------------------------------------------------------------------------------------------
---end
-
-
---▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 --										PROFILE
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FoxDBTest:onNewProfile()
-----------------------------------------------------------------------------------------------------
-print("|cFFFFFF00onNewProfile|r")
-end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 function FoxDBTest:onProfileChanged()
@@ -272,13 +237,6 @@ end
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
 
 
---▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-----------------------------------------------------------------------------------------------------
-function FoxDBTest:onNewLayout()
-----------------------------------------------------------------------------------------------------
-print("|cFFFFFF00onNewLayout|r")
-	Layout = Datas.layout
-end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
 function FoxDBTest:onLayoutLoaded()
@@ -332,59 +290,30 @@ function FoxDBTest:CreateFrames()
 	self.GlobalFrame	= self.GlobalFrame		or CreateFrame("Frame", "FoxDBTest_Global", UIParent, "BackdropTemplate")
 	self.LayoutFrame	= self.LayoutFrame		or CreateFrame("Frame", "FoxDBTest_Layout", UIParent, "BackdropTemplate")
 	self.ProfilFrame	= self.ProfilFrame		or CreateFrame("Frame", "FoxDBTest_Profil", UIParent, "BackdropTemplate")
-	self.GlobalOverlay	= self.GlobalOverlay	or CreateFrame("Frame", "FoxDBTest_Global.Selection", Distance, "EditModeSystemSelectionTemplate")
-	self.LayoutOverlay	= self.LayoutOverlay	or CreateFrame("Frame", "FoxDBTest_Layout.Selection", Distance, "EditModeSystemSelectionTemplate")
-	self.ProfilOverlay	= self.ProfilOverlay	or CreateFrame("Frame", "FoxDBTest_Profil.Selection", Distance, "EditModeSystemSelectionTemplate")
 
 	local GlobalFrame	= self.GlobalFrame
 	local LayoutFrame	= self.LayoutFrame
 	local ProfilFrame	= self.ProfilFrame
-	local GlobalOverlay	= self.GlobalOverlay
-	local LayoutOverlay	= self.LayoutOverlay
-	local ProfilOverlay	= self.ProfilOverlay
-
-	GlobalOverlay:EnableMouse(true)
-	LayoutOverlay:EnableMouse(true)
-	ProfilOverlay:EnableMouse(true)
-
-	GlobalOverlay:SetMovable(true)
-	LayoutOverlay:SetMovable(true)
-	ProfilOverlay:SetMovable(true)
 
 	GlobalFrame:SetClampedToScreen(true)
 	LayoutFrame:SetClampedToScreen(true)
 	ProfilFrame:SetClampedToScreen(true)
-	GlobalOverlay:SetClampedToScreen(true)
-	LayoutOverlay:SetClampedToScreen(true)
-	ProfilOverlay:SetClampedToScreen(true)
 
 	GlobalFrame:SetDontSavePosition(true)
 	LayoutFrame:SetDontSavePosition(true)
 	ProfilFrame:SetDontSavePosition(true)
-	GlobalOverlay:SetDontSavePosition(true)
-	LayoutOverlay:SetDontSavePosition(true)
-	ProfilOverlay:SetDontSavePosition(true)
 
 	GlobalFrame:SetSize(100, 100)
 	LayoutFrame:SetSize(100, 100)
 	ProfilFrame:SetSize(100, 100)
-	GlobalOverlay:SetSize(100, 100)
-	LayoutOverlay:SetSize(100, 100)
-	ProfilOverlay:SetSize(100, 100)
 
 	GlobalFrame:SetFrameStrata("MEDIUM")
 	LayoutFrame:SetFrameStrata("MEDIUM")
 	ProfilFrame:SetFrameStrata("MEDIUM")
-	GlobalOverlay:SetFrameStrata("HIGH")
-	LayoutOverlay:SetFrameStrata("HIGH")
-	ProfilOverlay:SetFrameStrata("HIGH")
 
 	GlobalFrame:SetFrameLevel(1)
 	LayoutFrame:SetFrameLevel(1)
 	ProfilFrame:SetFrameLevel(1)
-	GlobalOverlay:SetFrameLevel(200)
-	LayoutOverlay:SetFrameLevel(200)
-	ProfilOverlay:SetFrameLevel(200)
 
 	GlobalFrame:SetAlpha(0.75)
 	LayoutFrame:SetAlpha(0.75)
@@ -397,10 +326,6 @@ function FoxDBTest:CreateFrames()
 	GlobalFrame.texture:SetAllPoints(GlobalFrame)
 	LayoutFrame.texture:SetAllPoints(LayoutFrame)
 	ProfilFrame.texture:SetAllPoints(ProfilFrame)
-
-	GlobalOverlay.Label:SetText(L[2.0])
-	LayoutOverlay.Label:SetText(L[2.1])
-	ProfilOverlay.Label:SetText(L[2.2])
 
 	GlobalFrame:SetScript("OnEnter", function(btn)
 			GlobalFrame:SetAlpha(1)
@@ -449,88 +374,77 @@ function FoxDBTest:CreateFrames()
 			ProfilFrame:SetAlpha(0.75)
 		end)
 
-	GlobalOverlay:SetScript("OnDragStart", function()
-			GlobalOverlay:ClearAllPoints()
-			GlobalFrame:ClearAllPoints()
-			GlobalOverlay:SetAlpha(0)
-			GlobalOverlay:StartMoving()
-			GlobalOverlay:SetScript("OnUpdate", function(self)
-					local x, y = GlobalOverlay:GetCenter()
-					if x and y then
-						x = x/UIParent:GetScale()
-						y = y/UIParent:GetScale()
-						GlobalFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
-					end
-				end)
-		end)
-	LayoutOverlay:SetScript("OnDragStart", function()
-			LayoutOverlay:ClearAllPoints()
-			LayoutFrame:ClearAllPoints()
-			LayoutOverlay:SetAlpha(0)
-			LayoutOverlay:StartMoving()
-			LayoutOverlay:SetScript("OnUpdate", function(self)
-					local x, y = LayoutOverlay:GetCenter()
-					if x and y then
-						x = x/UIParent:GetScale()
-						y = y/UIParent:GetScale()
-						LayoutFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
-					end
-				end)
-		end)
-	ProfilOverlay:SetScript("OnDragStart", function()
-			ProfilOverlay:ClearAllPoints()
-			ProfilFrame:ClearAllPoints()
-			ProfilOverlay:SetAlpha(0)
-			ProfilOverlay:StartMoving()
-			ProfilOverlay:SetScript("OnUpdate", function(self)
-					local x, y = ProfilOverlay:GetCenter()
-					if x and y then
-						x = x/UIParent:GetScale()
-						y = y/UIParent:GetScale()
-						ProfilFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
-					end
-				end)
-		end)
+	local Dialog = FoxDBTest.Dialog
+	GlobalFrame.OnDragStart = function()
+			if Dialog then Dialog:Hide() end
+--			GlobalFrame:ClearAllPoints()
+			GlobalFrame:SetAlpha(0)
+			GlobalFrame:SetMovable(true)
+			GlobalFrame:StartMoving()
+		end
+	LayoutFrame.OnDragStart = function()
+			if Dialog then Dialog:Hide() end
+--			LayoutFrame:ClearAllPoints()
+			LayoutFrame:SetAlpha(0)
+			LayoutFrame:SetMovable(true)
+			LayoutFrame:StartMoving()
+		end
+	ProfilFrame.OnDragStart = function()
+			if Dialog then Dialog:Hide() end
+--			ProfilFrame:ClearAllPoints()
+			ProfilFrame:SetAlpha(0)
+			ProfilFrame:SetMovable(true)
+			ProfilFrame:StartMoving()
+		end
 
-	GlobalOverlay:SetScript("OnDragStop", function()
-			GlobalOverlay:SetAlpha(1)
-			GlobalOverlay:StopMovingOrSizing()
-			GlobalOverlay:SetScript("OnUpdate", nil)
-			GlobalFrame:ClearAllPoints()
-			local x, y = GlobalOverlay:GetCenter()
-			local scale = GlobalOverlay:GetScale()
+	GlobalFrame.OnDragStop = function()
+			GlobalFrame:SetMovable(false)
+			GlobalFrame:SetAlpha(1)
+			GlobalFrame:StopMovingOrSizing()
+--			GlobalFrame:ClearAllPoints()
+			local scale = Global.FramesScale*UIParent:GetScale()
+			local x, y = GlobalFrame:GetCenter()
 			if x and y and scale then
 				Global.Framex = x*scale
 				Global.Framey = y*scale
 			end
-			GlobalOverlay:SetAllPoints(GlobalFrame)
-		end)
-	LayoutOverlay:SetScript("OnDragStop", function()
-			LayoutOverlay:SetAlpha(1)
-			LayoutOverlay:StopMovingOrSizing()
-			LayoutOverlay:SetScript("OnUpdate", nil)
-			LayoutFrame:ClearAllPoints()
-			local scale = LayoutOverlay:GetScale()
-			local x, y = LayoutOverlay:GetCenter()
+		end
+	LayoutFrame.OnDragStop = function()
+			LayoutFrame:SetMovable(false)
+			LayoutFrame:SetAlpha(1)
+			LayoutFrame:StopMovingOrSizing()
+--			LayoutFrame:ClearAllPoints()
+			local scale = Global.FramesScale*UIParent:GetScale()
+			local x, y = LayoutFrame:GetCenter()
 			if x and y and scale then
 				Layout.Framex = x*scale
 				Layout.Framey = y*scale
 			end
-			LayoutOverlay:SetAllPoints(LayoutFrame)
-		end)
-	ProfilOverlay:SetScript("OnDragStop", function()
-			ProfilOverlay:SetAlpha(1)
-			ProfilOverlay:StopMovingOrSizing()
-			ProfilOverlay:SetScript("OnUpdate", nil)
-			ProfilFrame:ClearAllPoints()
-			local scale = ProfilOverlay:GetScale()
-			local x, y = ProfilOverlay:GetCenter()
+		end
+	ProfilFrame.OnDragStop = function()
+			ProfilFrame:SetMovable(false)
+			ProfilFrame:SetAlpha(1)
+			ProfilFrame:StopMovingOrSizing()
+--			ProfilFrame:ClearAllPoints()
+			local scale = Global.FramesScale*UIParent:GetScale()
+			local x, y = ProfilFrame:GetCenter()
 			if x and y and scale then
 				Profil.Framex = x*scale
 				Profil.Framey = y*scale
 			end
-			ProfilOverlay:SetAllPoints(ProfilFrame)
-		end)
+		end
+
+	self.GlobalOverlay = Datas:CreateSystemFrame(self.GlobalFrame, L[2.0], "FoxDBTest")
+	self.LayoutOverlay = Datas:CreateSystemFrame(self.LayoutFrame, L[2.1], "FoxDBTest")
+	self.ProfilOverlay = Datas:CreateSystemFrame(self.ProfilFrame, L[2.2], "FoxDBTest")
+
+	local GlobalOverlay	= self.GlobalOverlay
+	local LayoutOverlay	= self.LayoutOverlay
+	local ProfilOverlay	= self.ProfilOverlay
+
+	GlobalOverlay:SetSize(100, 100)
+	LayoutOverlay:SetSize(100, 100)
+	ProfilOverlay:SetSize(100, 100)
 
 	Datas:RegisterSystemFrame(GlobalOverlay)
 	Datas:RegisterSystemFrame(LayoutOverlay)
@@ -568,16 +482,10 @@ function FoxDBTest:SetFrames()
 	local GlobalFrame	= self.GlobalFrame
 	local LayoutFrame	= self.LayoutFrame
 	local ProfilFrame	= self.ProfilFrame
-	local GlobalOverlay	= self.GlobalOverlay
-	local LayoutOverlay	= self.LayoutOverlay
-	local ProfilOverlay	= self.ProfilOverlay
 
 	GlobalFrame:SetScale(Global.FramesScale)
 	LayoutFrame:SetScale(Global.FramesScale)
 	ProfilFrame:SetScale(Global.FramesScale)
-	GlobalOverlay:SetScale(Global.FramesScale)
-	LayoutOverlay:SetScale(Global.FramesScale)
-	ProfilOverlay:SetScale(Global.FramesScale)
 
 	self:SetLocation(GlobalFrame)
 	self:SetLocation(LayoutFrame)
@@ -600,9 +508,6 @@ function FoxDBTest:SetLocation(frame)
 	local GlobalFrame	= self.GlobalFrame
 	local LayoutFrame	= self.LayoutFrame
 	local ProfilFrame	= self.ProfilFrame
-	local GlobalOverlay	= self.GlobalOverlay
-	local LayoutOverlay	= self.LayoutOverlay
-	local ProfilOverlay	= self.ProfilOverlay
 
 	local x, y
 	if frame == GlobalFrame then
@@ -617,19 +522,11 @@ function FoxDBTest:SetLocation(frame)
 	else
 		return
 	end
-	x = x/UIParent:GetScale()/Global.FramesScale
-	y = y/UIParent:GetScale()/Global.FramesScale
+	x = x/(UIParent:GetScale()*Global.FramesScale)
+	y = y/(UIParent:GetScale()*Global.FramesScale)
 
 	frame:ClearAllPoints()
 	frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
-
-	if frame == GlobalFrame then
-		GlobalOverlay:SetAllPoints(GlobalFrame)
-	elseif frame == LayoutFrame then
-		LayoutOverlay:SetAllPoints(LayoutFrame)
-	elseif frame == ProfilFrame then
-		ProfilOverlay:SetAllPoints(ProfilFrame)
-	end
 end
 --▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
 ----------------------------------------------------------------------------------------------------
@@ -679,6 +576,35 @@ function FoxDBTest:SetColor(frame)
 		end
 	end
 end
+
+
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+--										ICON
+--▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+
+
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+function FoxDBTest:onIconLeftClick()
+----------------------------------------------------------------------------------------------------
+	if Settings.Category then OpenToCategory(Settings.Category)	end
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+function FoxDBTest:onIconRightClick()
+----------------------------------------------------------------------------------------------------
+	ReloadUI()
+end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+--function FoxDBTest:onIconMiddleClick()
+----------------------------------------------------------------------------------------------------
+--end
+--▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+----------------------------------------------------------------------------------------------------
+--function FoxDBTest:onIconVisibility(visible)
+----------------------------------------------------------------------------------------------------
+--end
 
 
 --▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
@@ -836,11 +762,11 @@ function FoxDBTest:DialogInit()
 	Dialog.Colored3:SetPoint("TOPLEFT", Dialog.Divider, "BOTTOMLEFT", -1, -2)
 	Dialog.Colored3:SetText("")
 	Dialog.Colored3:SetOnClickHandler(function()
-			if		CurrentFrame == 1 then Global.Colored = not Global.Colored FoxDBTest:SetColor(FoxDBTest.GlobalFrame)
-			elseif	CurrentFrame == 2 then Layout.Colored = not Layout.Colored FoxDBTest:SetColor(FoxDBTest.LayoutFrame)
-			elseif	CurrentFrame == 3 then Profil.Colored = not Profil.Colored FoxDBTest:SetColor(FoxDBTest.ProfilFrame)
+			local valueon
+			if		CurrentFrame == 1 then Global.Colored = not Global.Colored FoxDBTest:SetColor(FoxDBTest.GlobalFrame) valueon = Global.Colored
+			elseif	CurrentFrame == 2 then Layout.Colored = not Layout.Colored FoxDBTest:SetColor(FoxDBTest.LayoutFrame) valueon = Layout.Colored
+			elseif	CurrentFrame == 3 then Profil.Colored = not Profil.Colored FoxDBTest:SetColor(FoxDBTest.ProfilFrame) valueon = Profil.Colored
 			end
-			local valueon = CurrentFrame == 1 and Global.Colored or (CurrentFrame == 2 and Layout.Colored or Profil.Colored)
 			Dialog.Colored.Button:SetChecked(valueon)
 			Dialog.Colored2.Slider:SetValue(valueon and 100 or 0)
 		end)

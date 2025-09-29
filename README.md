@@ -21,7 +21,7 @@ This system is not in conflict with the systems already in place,
     to make a transition from an old one or to keep an old one as it is.
 
 Layout management is fully automated, user access is not required,
--  but some things are still doable.
+-  but some things are doable.
 
 You of course still have access to a simplified version of the profiles;
 -  otherwise, this part remains dormant.
@@ -52,10 +52,10 @@ Possibility of an Minimap icon, in ultra light code, without any inconvenience i
 
 EditMode:
 -  Addons that use EditMode receive a simplified common support for the correct functioning of all.
--  Automatic frame registration.
--  Automatic showing/hidding frames when entering/exiting EditMode.
--  Automatic hidding system menus and highlighting frames.
--  Receive a callback when a frame is clicked to hide/show your menu.
+-  Automatic overlays creation and registration.
+-  Automatic showing/hidding overlays when entering/exiting EditMode.
+-  Automatic hidding system menus and highlighting overlays.
+-  Receive a callback when an overlay has been clicked to hide/show your menu.
 
 Note:
 -  You manually start your addon, then load the Database, which will tell you when the layouts are ready;
